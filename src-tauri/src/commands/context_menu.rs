@@ -1,10 +1,11 @@
 use tauri::{
-    menu::{MenuBuilder, MenuItemBuilder},
-    AppHandle, Manager, Runtime, State, Window,
+    menu::{ContextMenu, MenuBuilder, MenuItemBuilder},
+    AppHandle, Runtime, State, Window,
 };
+use tauri_plugin_opener::OpenerExt;
 use tokio::sync::oneshot;
 
-use crate::{paths::from_forward_slashes, state::AppState};
+use crate::state::AppState;
 
 #[tauri::command]
 pub async fn show_file_context_menu<R: Runtime>(
@@ -17,7 +18,7 @@ pub async fn show_file_context_menu<R: Runtime>(
 
     let (tx, rx) = oneshot::channel::<Option<String>>();
 
-    // Replace any stale pending sender
+    // Replace any stale pending sender with None resolution
     {
         let mut pending = state.ctx_pending.lock().unwrap();
         if let Some(old_tx) = pending.take() {
@@ -39,21 +40,16 @@ pub async fn show_file_context_menu<R: Runtime>(
     // Await the selection (resolved by on_menu_event in lib.rs)
     let choice = rx.await.unwrap_or(None);
 
-    // Handle side effects for delete and reveal
-    if let Some(ref action) = choice {
-        match action.as_str() {
-            "ctx:delete" => {
-                trash::delete(&native).map_err(|e| e.to_string())?;
-                return Ok(None);
-            }
-            "ctx:reveal" => {
-                // Use opener plugin to reveal in file explorer
-                let _ = app.opener().reveal_item_in_dir(&native);
-                return Ok(None);
-            }
-            _ => {}
+    match choice.as_deref() {
+        Some("ctx:delete") => {
+            trash::delete(&native).map_err(|e| e.to_string())?;
+            Ok(None)
         }
+        Some("ctx:reveal") => {
+            let _ = app.opener().reveal_item_in_dir(&native);
+            Ok(None)
+        }
+        Some("ctx:rename") => Ok(Some("rename".to_string())),
+        _ => Ok(None),
     }
-
-    Ok(choice.and_then(|c| if c == "ctx:rename" { Some("rename".to_string()) } else { None }))
 }

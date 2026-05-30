@@ -1,4 +1,4 @@
-use tauri::{Manager, Runtime, Window};
+use tauri::{Runtime, Window};
 
 #[tauri::command]
 pub fn set_window_title<R: Runtime>(window: Window<R>, title: String) -> Result<(), String> {
@@ -7,14 +7,9 @@ pub fn set_window_title<R: Runtime>(window: Window<R>, title: String) -> Result<
 
 #[tauri::command]
 pub fn set_focus_mode<R: Runtime>(window: Window<R>, enabled: bool) -> Result<(), String> {
-    window.set_fullscreen(enabled).map_err(|e| e.to_string())?;
-    // Hide the menu bar when entering focus mode
-    if enabled {
-        window.menu_handle().hide().ok();
-    } else {
-        window.menu_handle().show().ok();
-    }
-    Ok(())
+    // With decorations:false, there's no native menu bar to toggle.
+    // Just toggle fullscreen for focus mode.
+    window.set_fullscreen(enabled).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

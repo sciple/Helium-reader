@@ -1,12 +1,15 @@
-use std::{path::PathBuf, time::Duration};
+use std::time::Duration;
 
-use notify::RecursiveMode;
-use notify_debouncer_full::{new_debouncer, DebounceEventResult, FileIdMap};
+use notify_debouncer_full::{
+    new_debouncer,
+    notify::{EventKind, RecursiveMode, Watcher},
+    DebounceEventResult,
+};
 use tauri::{AppHandle, Emitter, State};
 
 use crate::{
     models::FileChangedPayload,
-    paths::{from_forward_slashes, to_forward_slashes},
+    paths::to_forward_slashes,
     state::{AppState, WatchHandle},
 };
 
@@ -26,7 +29,7 @@ pub fn watch_folder(
     }
 
     let app_handle = app.clone();
-    let debouncer = new_debouncer(
+    let mut debouncer = new_debouncer(
         Duration::from_millis(150),
         None,
         move |result: DebounceEventResult| {
@@ -36,32 +39,27 @@ pub fn watch_folder(
             };
 
             for debounced in events {
-                use notify::EventKind::*;
-                let kind = &debounced.event.kind;
-                let event_name = match kind {
-                    Create(_) => "add",
-                    Modify(notify::event::ModifyKind::Name(
-                        notify::event::RenameMode::From,
+                let event_name = match &debounced.event.kind {
+                    EventKind::Create(_) => "add",
+                    EventKind::Modify(notify_debouncer_full::notify::event::ModifyKind::Name(
+                        notify_debouncer_full::notify::event::RenameMode::From,
                     )) => "unlink",
-                    Modify(notify::event::ModifyKind::Name(
-                        notify::event::RenameMode::To,
+                    EventKind::Modify(notify_debouncer_full::notify::event::ModifyKind::Name(
+                        notify_debouncer_full::notify::event::RenameMode::To,
                     )) => "add",
-                    Modify(_) => "change",
-                    Remove(_) => "unlink",
+                    EventKind::Modify(_) => "change",
+                    EventKind::Remove(_) => "unlink",
                     _ => continue,
                 };
 
-                for path in &debounced.event.paths {
-                    // Skip dotfiles / hidden paths
-                    if path_has_dotfile(path) {
+                for p in &debounced.event.paths {
+                    if path_has_dotfile(p) {
                         continue;
                     }
-
                     let payload = FileChangedPayload {
-                        path: to_forward_slashes(path),
+                        path: to_forward_slashes(p),
                         event: event_name.to_string(),
                     };
-
                     let _ = app_handle.emit("fs:changed", payload);
                 }
             }
@@ -90,10 +88,8 @@ pub fn unwatch_folder(state: State<AppState>, path: String) -> Result<(), String
     Ok(())
 }
 
-fn path_has_dotfile(p: &PathBuf) -> bool {
+fn path_has_dotfile(p: &std::path::Path) -> bool {
     p.components().any(|c| {
-        c.as_os_str()
-            .to_string_lossy()
-            .starts_with('.')
+        c.as_os_str().to_string_lossy().starts_with('.')
     })
 }

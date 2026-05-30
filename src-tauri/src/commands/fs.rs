@@ -48,11 +48,6 @@ fn read_dir_recursive(
             continue;
         }
 
-        let file_type = entry.file_type().unwrap_or_else(|_| {
-            // treat as file if we can't determine
-            entry.file_type().expect("file_type failed twice")
-        });
-
         let is_dir = match entry.file_type() {
             Ok(ft) => ft.is_dir(),
             Err(_) => continue,

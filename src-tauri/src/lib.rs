@@ -34,6 +34,8 @@ pub fn run() {
             let _ = app.emit(&id, ());
         })
         .invoke_handler(tauri::generate_handler![
+            commands::chat::chat_send,
+            commands::chat::chat_abort,
             commands::fs::read_directory,
             commands::fs::read_file,
             commands::fs::write_file,

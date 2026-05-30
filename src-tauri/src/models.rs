@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -44,9 +44,3 @@ pub struct RenameResult {
     pub new_path: String,
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ChatMessage {
-    pub role: String,
-    pub content: String,
-}

@@ -7,7 +7,19 @@ import type {
   WriteFileResult,
   FileChangedPayload,
   ConfirmDiscardResult,
+  ChatUsage,
 } from '@shared/types'
+
+// Wrap Tauri's async listen() so callers get a synchronous unsubscribe fn back.
+function wrapListen<T>(event: string, handler: (payload: T) => void): () => void {
+  let unlisten: (() => void) | null = null
+  const p = listen<T>(event, (e) => handler(e.payload))
+  p.then((fn) => { unlisten = fn })
+  return () => {
+    if (unlisten) unlisten()
+    else p.then((fn) => fn())
+  }
+}
 
 const MENU_EVENTS = [
   'menu:new-file',
@@ -28,14 +40,18 @@ for (const name of MENU_EVENTS) {
 }
 
 const api: WindowApi = {
-  // Chat is deferred — provide no-op stubs so the renderer mounts cleanly.
   chat: {
-    send: () => {},
-    abort: () => {},
-    onChunk: () => () => {},
-    onDone: () => () => {},
-    onError: () => () => {},
-    onUsage: () => () => {},
+    // fire-and-forget: chat_send spawns a task; no return value needed
+    send: ({ url, model, messages }) => {
+      void invoke('chat_send', { url, model, messages })
+    },
+    abort: () => {
+      void invoke('chat_abort')
+    },
+    onChunk: (cb) => wrapListen<string>('chat:chunk', cb),
+    onDone: (cb) => wrapListen<null>('chat:done', () => cb()),
+    onError: (cb) => wrapListen<string>('chat:error', cb),
+    onUsage: (cb) => wrapListen<ChatUsage>('chat:usage', cb),
   },
 
   openFolderDialog: () =>
@@ -56,19 +72,7 @@ const api: WindowApi = {
   unwatchFolder: (path) =>
     invoke<void>('unwatch_folder', { path }),
 
-  onFileChanged: (cb) => {
-    // Tauri's listen() is async; wrap to return a synchronous unsubscribe fn.
-    let unlisten: (() => void) | null = null
-    const promise = listen<FileChangedPayload>('fs:changed', (e) => cb(e.payload))
-    promise.then((fn) => { unlisten = fn })
-    return () => {
-      if (unlisten) {
-        unlisten()
-      } else {
-        promise.then((fn) => fn())
-      }
-    }
-  },
+  onFileChanged: (cb) => wrapListen<FileChangedPayload>('fs:changed', cb),
 
   setWindowTitle: (title) =>
     invoke<void>('set_window_title', { title }),
