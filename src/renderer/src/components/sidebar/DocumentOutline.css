@@ -1,0 +1,98 @@
+.doc-outline {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* ── Header toggle ──────────────────────────────────────────────────────── */
+
+.doc-outline__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 6px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-faint);
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  transition: color 0.15s;
+}
+.doc-outline__header:hover { color: var(--color-text); }
+
+.doc-outline__chevron {
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+/* ── Body ───────────────────────────────────────────────────────────────── */
+
+.doc-outline__body {
+  overflow-y: auto;
+  max-height: 240px;
+  padding: 2px 0 6px;
+}
+
+.doc-outline__empty {
+  display: block;
+  font-size: 0.78em;
+  color: var(--color-text-faint);
+  padding: 4px 14px 6px;
+  font-style: italic;
+}
+
+.doc-outline__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doc-outline__item {
+  display: flex;
+}
+
+.doc-outline__link {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  width: 100%;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  font-size: 0.8em;
+  text-align: left;
+  transition: background 0.1s, color 0.1s;
+  border-radius: 3px;
+}
+.doc-outline__link:hover {
+  background: var(--color-hover);
+  color: var(--color-text);
+}
+
+.doc-outline__marker {
+  color: var(--color-text-faint);
+  flex-shrink: 0;
+  font-size: 0.85em;
+}
+
+.doc-outline__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Divider separating outline from file tree ─────────────────────────── */
+
+.doc-outline__divider {
+  height: 0;
+}

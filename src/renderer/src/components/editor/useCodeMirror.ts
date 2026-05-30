@@ -57,6 +57,28 @@ export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | nul
     return () => window.removeEventListener('editor:replace-selection', handler)
   }, [])
 
+  // Scroll editor to a heading when an outline item is clicked
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const view = viewRef.current
+      if (!view) return
+      const { text, level } = (e as CustomEvent<{ text: string; level: number }>).detail
+      const prefix = '#'.repeat(level) + ' '
+      const doc = view.state.doc
+      let pos = 0
+      for (let i = 1; i <= doc.lines; i++) {
+        const line = doc.line(i)
+        if (line.text.startsWith(prefix) && line.text.slice(prefix.length).trim() === text.trim()) {
+          view.dispatch({ effects: EditorView.scrollIntoView(line.from, { y: 'start', yMargin: 40 }) })
+          break
+        }
+        pos = line.to + 1
+      }
+    }
+    window.addEventListener('editor:scroll-to-heading', handler)
+    return () => window.removeEventListener('editor:scroll-to-heading', handler)
+  }, [])
+
   // Swap CM theme when colorTheme changes
   useEffect(() => {
     const view = viewRef.current

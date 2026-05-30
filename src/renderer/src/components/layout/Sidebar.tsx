@@ -5,6 +5,7 @@ import { useFileSystem } from '../../hooks/useFileSystem'
 import { useUiStore } from '../../store/uiStore'
 import FolderPicker from '../sidebar/FolderPicker'
 import FileTree from '../sidebar/FileTree'
+import DocumentOutline from '../sidebar/DocumentOutline'
 
 export default function Sidebar() {
   const rootPath = useFileSystemStore((s) => s.rootPath)
@@ -71,6 +72,7 @@ export default function Sidebar() {
               </button>
             </div>
           </div>
+          <DocumentOutline />
           <FileTree
             creatingAtRoot={creatingAtRoot}
             onRootCreateDone={() => setCreatingAtRoot(false)}
