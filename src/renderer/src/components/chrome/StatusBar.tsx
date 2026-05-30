@@ -32,6 +32,11 @@ export default function StatusBar() {
         {words} words · {chars} chars
         {sentences !== null && <> · ~{sentences} sentence{sentences !== 1 ? 's' : ''}</>}
       </span>
+      {hasSelection && (
+        <span className="statusbar__hint">
+          <kbd>Ctrl+Shift+L</kbd> ask AI
+        </span>
+      )}
     </div>
   )
 }

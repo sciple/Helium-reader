@@ -1,7 +1,7 @@
 .statusbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
   height: var(--statusbar-height);
   background: var(--color-statusbar);
   border-top: 1px solid var(--color-border);
@@ -22,3 +22,26 @@
 .statusbar__dirty { color: var(--color-accent); }
 
 .statusbar__stats { white-space: nowrap; color: var(--color-text-muted); }
+
+.statusbar__hint {
+  white-space: nowrap;
+  color: var(--color-text-faint);
+  margin-left: auto;
+  font-size: 0.9em;
+  animation: hint-fade-in 0.15s ease;
+}
+
+.statusbar__hint kbd {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+@keyframes hint-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

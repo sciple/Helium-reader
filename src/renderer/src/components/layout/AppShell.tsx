@@ -1,7 +1,8 @@
 import './AppShell.css'
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import TitleBar from '../chrome/TitleBar'
 import StatusBar from '../chrome/StatusBar'
+import ShortcutsOverlay from '../chrome/ShortcutsOverlay'
 import Sidebar from './Sidebar'
 import SplitPane from './SplitPane'
 import ChatPanel from '../chat/ChatPanel'
@@ -13,13 +14,8 @@ export default function AppShell() {
   const chatPanelVisible = useUiStore((s) => s.chatPanelVisible)
   const chatPanelWidth = useUiStore((s) => s.chatPanelWidth)
   const setChatPanelWidth = useUiStore((s) => s.setChatPanelWidth)
-  const toggleChatPanel = useUiStore((s) => s.toggleChatPanel)
-
-  useEffect(() => {
-    const handler = () => toggleChatPanel()
-    window.addEventListener('menu:toggle-chat', handler)
-    return () => window.removeEventListener('menu:toggle-chat', handler)
-  }, [toggleChatPanel])
+  const shortcutsVisible = useUiStore((s) => s.shortcutsVisible)
+  const setShortcutsVisible = useUiStore((s) => s.setShortcutsVisible)
 
   const isDragging = useRef(false)
   const startX = useRef(0)
@@ -77,6 +73,7 @@ export default function AppShell() {
         )}
       </div>
       {!focusMode && <StatusBar />}
+      {shortcutsVisible && <ShortcutsOverlay onClose={() => setShortcutsVisible(false)} />}
     </div>
   )
 }

@@ -20,6 +20,7 @@ interface UiState {
   newFileRequested: boolean
   chatPanelVisible: boolean
   chatPanelWidth: number
+  shortcutsVisible: boolean
   toggleSidebar: () => void
   setSidebarVisible: (v: boolean) => void
   toggleFocusMode: () => void
@@ -35,6 +36,8 @@ interface UiState {
   clearNewFileRequest: () => void
   toggleChatPanel: () => void
   setChatPanelWidth: (w: number) => void
+  toggleShortcuts: () => void
+  setShortcutsVisible: (v: boolean) => void
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -49,6 +52,7 @@ export const useUiStore = create<UiState>((set) => ({
   newFileRequested: false,
   chatPanelVisible: false,
   chatPanelWidth: 340,
+  shortcutsVisible: false,
 
   toggleSidebar: () => set((s) => ({ sidebarVisible: !s.sidebarVisible })),
   setSidebarVisible: (v) => set({ sidebarVisible: v }),
@@ -66,5 +70,7 @@ export const useUiStore = create<UiState>((set) => ({
   requestNewFile: () => set({ newFileRequested: true }),
   clearNewFileRequest: () => set({ newFileRequested: false }),
   toggleChatPanel: () => set((s) => ({ chatPanelVisible: !s.chatPanelVisible })),
-  setChatPanelWidth: (w) => set({ chatPanelWidth: Math.max(240, Math.min(600, w)) })
+  setChatPanelWidth: (w) => set({ chatPanelWidth: Math.max(240, Math.min(600, w)) }),
+  toggleShortcuts: () => set((s) => ({ shortcutsVisible: !s.shortcutsVisible })),
+  setShortcutsVisible: (v) => set({ shortcutsVisible: v }),
 }))

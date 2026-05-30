@@ -12,6 +12,7 @@ export default function App() {
   const toggleFocusMode = useUiStore((s) => s.toggleFocusMode)
   const togglePreview = useUiStore((s) => s.togglePreview)
   const toggleChatPanel = useUiStore((s) => s.toggleChatPanel)
+  const toggleShortcuts = useUiStore((s) => s.toggleShortcuts)
   const requestNewFile = useUiStore((s) => s.requestNewFile)
   const colorTheme = useUiStore((s) => s.colorTheme)
 
@@ -77,6 +78,15 @@ export default function App() {
         e.preventDefault()
         handleToggleChat()
       }
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const tag = (document.activeElement?.tagName ?? '').toLowerCase()
+        const inInput = tag === 'input' || tag === 'textarea' ||
+          document.activeElement?.closest('.cm-editor') != null
+        if (!inInput) {
+          e.preventDefault()
+          toggleShortcuts()
+        }
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -100,7 +110,7 @@ export default function App() {
       window.removeEventListener('menu:toggle-preview', togglePreview)
       window.removeEventListener('menu:toggle-chat', handleToggleChat)
     }
-  }, [openFolder, toggleSidebar, toggleFocusMode, togglePreview, toggleChatPanel, requestNewFile])
+  }, [openFolder, toggleSidebar, toggleFocusMode, togglePreview, toggleChatPanel, toggleShortcuts, requestNewFile])
 
   return <AppShell />
 }

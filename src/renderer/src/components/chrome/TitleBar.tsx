@@ -31,6 +31,7 @@ export default function TitleBar() {
   const decreaseEditorFontSize = useUiStore((s) => s.decreaseEditorFontSize)
   const proseWidth = useUiStore((s) => s.proseWidth)
   const setProseWidth = useUiStore((s) => s.setProseWidth)
+  const toggleShortcuts = useUiStore((s) => s.toggleShortcuts)
 
   const fileName = currentFilePath
     ? currentFilePath.split('/').pop()
@@ -137,6 +138,14 @@ export default function TitleBar() {
             </button>
           ))}
         </div>
+        <button
+          className="titlebar__tool titlebar__tool--help"
+          onClick={toggleShortcuts}
+          title="Keyboard shortcuts (?)"
+          aria-label="Show keyboard shortcuts"
+        >
+          ?
+        </button>
       </div>
       <div className="titlebar__drag" />
       <span className="titlebar__title">{title}</span>
