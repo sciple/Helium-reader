@@ -62,6 +62,8 @@ async fn stream_chat(
             "content": m.content,
         })).collect::<Vec<_>>(),
         "stream": true,
+        // Request usage stats in the final streaming chunk (OpenAI-compatible)
+        "stream_options": { "include_usage": true },
     });
 
     let mut response = Client::new()
