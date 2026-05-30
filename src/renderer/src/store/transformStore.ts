@@ -48,10 +48,17 @@ export const useTransformStore = create<TransformState>((set, get) => ({
     // Clean up any previous stream
     _cleanup?.()
 
-    const { lmStudioUrl: url, model, systemPrompt } = useChatStore.getState()
+    const { lmStudioUrl: url, model } = useChatStore.getState()
 
     const messages = [
-      ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+      {
+        role: 'system',
+        content:
+          'You are a precise writing assistant. ' +
+          'Return ONLY the rewritten text — no preamble, no explanation, no commentary, no closing remarks. ' +
+          'Do not begin with phrases like "Here is", "Certainly", "Sure", or "I hope". ' +
+          'Output the transformed text and nothing else.',
+      },
       { role: 'user', content: `${instruction.trim()}:\n\n${originalText}` },
     ]
 

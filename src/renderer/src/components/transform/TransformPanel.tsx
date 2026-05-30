@@ -19,6 +19,11 @@ export default function TransformPanel() {
 
   const customRef = useRef<HTMLInputElement>(null)
 
+  // Focus the custom input when the panel opens
+  useEffect(() => {
+    customRef.current?.focus()
+  }, [])
+
   // Esc closes the panel (unless streaming, where it aborts)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
