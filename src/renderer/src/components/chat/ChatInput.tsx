@@ -20,13 +20,24 @@ export default function ChatInput({ onSend, onAbort, isStreaming }: Props) {
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`
   })
 
+  // Focus this textarea when the chat panel opens via keyboard
+  useEffect(() => {
+    const handler = () => textareaRef.current?.focus()
+    window.addEventListener('focus-chat-input', handler)
+    return () => window.removeEventListener('focus-chat-input', handler)
+  }, [])
+
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       submit()
     }
-    if (e.key === 'Escape' && isStreaming) {
-      onAbort()
+    if (e.key === 'Escape') {
+      if (isStreaming) {
+        onAbort()
+      } else {
+        window.dispatchEvent(new CustomEvent('focus-editor'))
+      }
     }
   }
 

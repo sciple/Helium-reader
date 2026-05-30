@@ -11,6 +11,7 @@ export default function App() {
   const toggleSidebar = useUiStore((s) => s.toggleSidebar)
   const toggleFocusMode = useUiStore((s) => s.toggleFocusMode)
   const togglePreview = useUiStore((s) => s.togglePreview)
+  const toggleChatPanel = useUiStore((s) => s.toggleChatPanel)
   const requestNewFile = useUiStore((s) => s.requestNewFile)
   const colorTheme = useUiStore((s) => s.colorTheme)
 
@@ -43,6 +44,21 @@ export default function App() {
       window.api.setWindowTitle(`${path.split('/').pop()} — Helium Reader`)
     }
 
+    const handleToggleChat = () => {
+      const chatHasFocus = document.activeElement?.closest('.chat-panel') != null
+      const isVisible = useUiStore.getState().chatPanelVisible
+
+      if (isVisible && chatHasFocus) {
+        // Already in the chat — close it and return to the editor
+        toggleChatPanel()
+        window.dispatchEvent(new CustomEvent('focus-editor'))
+      } else {
+        // Coming from the editor (with or without selection) — open if needed and focus input
+        if (!isVisible) toggleChatPanel()
+        window.dispatchEvent(new CustomEvent('focus-chat-input'))
+      }
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
@@ -57,6 +73,10 @@ export default function App() {
         e.preventDefault()
         togglePreview()
       }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'l') {
+        e.preventDefault()
+        handleToggleChat()
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
@@ -67,6 +87,7 @@ export default function App() {
     window.addEventListener('menu:toggle-sidebar', toggleSidebar)
     window.addEventListener('menu:toggle-focus', toggleFocusMode)
     window.addEventListener('menu:toggle-preview', togglePreview)
+    window.addEventListener('menu:toggle-chat', handleToggleChat)
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
@@ -77,8 +98,9 @@ export default function App() {
       window.removeEventListener('menu:toggle-sidebar', toggleSidebar)
       window.removeEventListener('menu:toggle-focus', toggleFocusMode)
       window.removeEventListener('menu:toggle-preview', togglePreview)
+      window.removeEventListener('menu:toggle-chat', handleToggleChat)
     }
-  }, [openFolder, toggleSidebar, toggleFocusMode, togglePreview, requestNewFile])
+  }, [openFolder, toggleSidebar, toggleFocusMode, togglePreview, toggleChatPanel, requestNewFile])
 
   return <AppShell />
 }

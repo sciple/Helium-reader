@@ -36,6 +36,13 @@ export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | nul
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerRef])
 
+  // Focus the editor in response to keyboard navigation from other panels
+  useEffect(() => {
+    const handler = () => viewRef.current?.focus()
+    window.addEventListener('focus-editor', handler)
+    return () => window.removeEventListener('focus-editor', handler)
+  }, [])
+
   // Swap CM theme when colorTheme changes
   useEffect(() => {
     const view = viewRef.current
