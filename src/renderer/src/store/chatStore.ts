@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { useEditorStore } from './editorStore'
 
 export interface ChatMessage {
   id: string
@@ -23,6 +24,8 @@ interface ChatState {
   setSystemPrompt: (prompt: string) => void
   setContextWindow: (value: number | null) => void
   removeMessage: (id: string) => void
+  includeDocument: boolean
+  toggleIncludeDocument: () => void
 }
 
 function parseContextWindow(raw: string | null): number | null {
@@ -40,6 +43,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   contextWindow: parseContextWindow(localStorage.getItem('lmStudioContextWindow')),
   contextUsed: 0,
   _cleanup: null,
+  includeDocument: false,
 
   sendMessage: async (userText, contextText) => {
     if (get().isStreaming) return
@@ -62,7 +66,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
 
     // Capture state before adding new messages to build the API payload
-    const { lmStudioUrl, model, systemPrompt, messages: history } = get()
+    const { lmStudioUrl, model, systemPrompt, messages: history, includeDocument } = get()
+    const { content: docContent, currentFilePath } = useEditorStore.getState()
+    const fileName = currentFilePath?.split('/').pop() ?? 'document'
 
     set((s) => ({
       messages: [...s.messages, userMessage, assistantMessage],
@@ -71,6 +77,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
     const apiMessages = [
       ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
+      ...(includeDocument && docContent
+        ? [{ role: 'system' as const, content: `Document context — ${fileName}:\n\n${docContent}` }]
+        : []),
       ...[...history, userMessage].map((m) => ({
         role: m.role as 'user' | 'assistant' | 'system',
         content: m.content
@@ -136,6 +145,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   removeMessage: (id) => set((s) => ({ messages: s.messages.filter((m) => m.id !== id), contextUsed: 0 })),
+  toggleIncludeDocument: () => set((s) => ({ includeDocument: !s.includeDocument })),
 
   setContextWindow: (value) => {
     if (value != null) localStorage.setItem('lmStudioContextWindow', String(value))

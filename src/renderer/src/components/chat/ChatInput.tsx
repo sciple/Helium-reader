@@ -1,5 +1,6 @@
 import { useRef, useEffect, KeyboardEvent } from 'react'
 import { useEditorStore } from '../../store/editorStore'
+import { useChatStore } from '../../store/chatStore'
 
 interface Props {
   onSend: (text: string, contextText: string) => void
@@ -11,6 +12,11 @@ export default function ChatInput({ onSend, onAbort, isStreaming }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const selectedText = useEditorStore((s) => s.selectedText)
   const selectionSize = useEditorStore((s) => s.selectionSize)
+  const includeDocument = useChatStore((s) => s.includeDocument)
+  const docContent = useEditorStore((s) => s.content)
+  const docPath = useEditorStore((s) => s.currentFilePath)
+  const docName = docPath?.split('/').pop() ?? 'document'
+  const docWords = docContent.trim() === '' ? 0 : docContent.trim().split(/\s+/).length
 
   // Auto-resize textarea
   useEffect(() => {
@@ -53,6 +59,11 @@ export default function ChatInput({ onSend, onAbort, isStreaming }: Props) {
 
   return (
     <div className="chat-input">
+      {includeDocument && docContent && (
+        <div className="chat-input__context-badge chat-input__context-badge--doc">
+          📄 {docName} · {docWords.toLocaleString()} words as context
+        </div>
+      )}
       {selectionSize > 0 && (
         <div className="chat-input__context-badge">
           Using {selectionSize} chars from selection as context

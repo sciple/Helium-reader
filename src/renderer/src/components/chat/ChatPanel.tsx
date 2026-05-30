@@ -1,12 +1,14 @@
 import './ChatPanel.css'
 import { useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../../store/chatStore'
+import { useEditorStore } from '../../store/editorStore'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
 
 export default function ChatPanel() {
-  const { messages, isStreaming, lmStudioUrl, model, systemPrompt, contextWindow, contextUsed, sendMessage, abort, clearHistory, removeMessage, setUrl, setModel, setSystemPrompt, setContextWindow } =
+  const { messages, isStreaming, lmStudioUrl, model, systemPrompt, contextWindow, contextUsed, sendMessage, abort, clearHistory, removeMessage, setUrl, setModel, setSystemPrompt, setContextWindow, includeDocument, toggleIncludeDocument } =
     useChatStore()
+  const currentFilePath = useEditorStore((s) => s.currentFilePath)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [urlDraft, setUrlDraft] = useState(lmStudioUrl)
@@ -42,6 +44,14 @@ export default function ChatPanel() {
       <div className="chat-panel__header">
         <span className="chat-panel__title">Chat</span>
         <div className="chat-panel__header-actions">
+          <button
+            className={`chat-panel__icon-btn${includeDocument ? ' chat-panel__icon-btn--active' : ''}`}
+            onClick={toggleIncludeDocument}
+            disabled={!currentFilePath}
+            title={includeDocument ? 'Remove document from context' : 'Include full document as context'}
+          >
+            📄
+          </button>
           <button
             className={`chat-panel__icon-btn${settingsOpen ? ' chat-panel__icon-btn--active' : ''}`}
             onClick={() => setSettingsOpen((v) => !v)}

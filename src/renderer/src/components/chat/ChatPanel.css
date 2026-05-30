@@ -260,6 +260,11 @@
   padding: 3px 8px;
 }
 
+.chat-input__context-badge--doc {
+  color: var(--color-text-muted);
+  border-left: 2px solid var(--color-text-faint);
+}
+
 .chat-input__row {
   display: flex;
   gap: 6px;
