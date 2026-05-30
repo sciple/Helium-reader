@@ -105,3 +105,15 @@ const api: WindowApi = {
 }
 
 window.api = api
+
+// Transform API — Tauri-native, not part of the Electron-origin WindowApi.
+// Imported directly by transformStore; not on window.api.
+export const transformApi = {
+  send: (payload: { url: string; model: string; messages: { role: string; content: string }[] }) => {
+    void invoke('transform_send', payload)
+  },
+  abort: () => { void invoke('transform_abort') },
+  onChunk: (cb: (delta: string) => void) => wrapListen<string>('transform:chunk', cb),
+  onDone:  (cb: () => void)              => wrapListen<null>('transform:done', () => cb()),
+  onError: (cb: (msg: string) => void)   => wrapListen<string>('transform:error', cb),
+}

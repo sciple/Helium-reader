@@ -25,6 +25,7 @@ const SECTIONS = [
       ['Ctrl+N',         'New file'],
       ['Ctrl+Z',         'Undo'],
       ['Ctrl+Shift+Z',   'Redo'],
+      ['Ctrl+Shift+T',   'Transform selection'],
     ],
   },
   {

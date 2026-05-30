@@ -35,6 +35,8 @@ export default function StatusBar() {
       {hasSelection && (
         <span className="statusbar__hint">
           <kbd>Ctrl+Shift+L</kbd> ask AI
+          <span className="statusbar__hint-sep">·</span>
+          <kbd>Ctrl+Shift+T</kbd> transform
         </span>
       )}
     </div>

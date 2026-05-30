@@ -42,6 +42,30 @@
   background: var(--color-accent);
 }
 
+.app-shell__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.app-shell__transform-divider {
+  height: 4px;
+  flex-shrink: 0;
+  background: var(--color-divider);
+  cursor: row-resize;
+  transition: background 0.15s;
+}
+.app-shell__transform-divider:hover {
+  background: var(--color-accent);
+}
+
+.app-shell__transform {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
 .app-shell--focus .app-shell__body {
   justify-content: center;
 }

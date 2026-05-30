@@ -10,6 +10,8 @@ pub struct ChatMessage {
     pub content: String,
 }
 
+// ── Chat ─────────────────────────────────────────────────────────────────────
+
 #[tauri::command]
 pub fn chat_send(
     app: AppHandle,
@@ -18,22 +20,17 @@ pub fn chat_send(
     model: String,
     messages: Vec<ChatMessage>,
 ) {
-    // Abort any in-flight stream before starting a new one
     {
         let mut handle = state.chat_handle.lock().unwrap();
-        if let Some(h) = handle.take() {
-            h.abort();
-        }
+        if let Some(h) = handle.take() { h.abort(); }
     }
-
     let app_clone = app.clone();
     let handle = tauri::async_runtime::spawn(async move {
-        if let Err(e) = stream_chat(app_clone.clone(), url, model, messages).await {
+        if let Err(e) = stream_completion(app_clone.clone(), url, model, messages, "chat").await {
             let _ = app_clone.emit("chat:error", e);
             let _ = app_clone.emit("chat:done", ());
         }
     });
-
     *state.chat_handle.lock().unwrap() = Some(handle);
 }
 
@@ -42,16 +39,51 @@ pub fn chat_abort(app: AppHandle, state: State<'_, AppState>) {
     let mut handle = state.chat_handle.lock().unwrap();
     if let Some(h) = handle.take() {
         h.abort();
-        // Emit done so the renderer clears its streaming state
         let _ = app.emit("chat:done", ());
     }
 }
 
-async fn stream_chat(
+// ── Transform ─────────────────────────────────────────────────────────────────
+
+#[tauri::command]
+pub fn transform_send(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    url: String,
+    model: String,
+    messages: Vec<ChatMessage>,
+) {
+    {
+        let mut handle = state.transform_handle.lock().unwrap();
+        if let Some(h) = handle.take() { h.abort(); }
+    }
+    let app_clone = app.clone();
+    let handle = tauri::async_runtime::spawn(async move {
+        if let Err(e) = stream_completion(app_clone.clone(), url, model, messages, "transform").await {
+            let _ = app_clone.emit("transform:error", e);
+            let _ = app_clone.emit("transform:done", ());
+        }
+    });
+    *state.transform_handle.lock().unwrap() = Some(handle);
+}
+
+#[tauri::command]
+pub fn transform_abort(app: AppHandle, state: State<'_, AppState>) {
+    let mut handle = state.transform_handle.lock().unwrap();
+    if let Some(h) = handle.take() {
+        h.abort();
+        let _ = app.emit("transform:done", ());
+    }
+}
+
+// ── Shared streaming helper ───────────────────────────────────────────────────
+
+async fn stream_completion(
     app: AppHandle,
     url: String,
     model: String,
     messages: Vec<ChatMessage>,
+    prefix: &str,
 ) -> Result<(), String> {
     let endpoint = format!("{}/v1/chat/completions", url.trim_end_matches('/'));
 
@@ -62,7 +94,6 @@ async fn stream_chat(
             "content": m.content,
         })).collect::<Vec<_>>(),
         "stream": true,
-        // Request usage stats in the final streaming chunk (OpenAI-compatible)
         "stream_options": { "include_usage": true },
     });
 
@@ -75,8 +106,13 @@ async fn stream_chat(
         .map_err(|e| e.to_string())?;
 
     if !response.status().is_success() {
-        return Err(format!("HTTP {}: {}", response.status(), response.status().canonical_reason().unwrap_or("")));
+        return Err(format!("HTTP {}: {}", response.status(),
+            response.status().canonical_reason().unwrap_or("")));
     }
+
+    let chunk_event = format!("{}:chunk", prefix);
+    let done_event  = format!("{}:done",  prefix);
+    let usage_event = format!("{}:usage", prefix);
 
     let mut buffer = String::new();
 
@@ -90,29 +126,24 @@ async fn stream_chat(
                     let line = buffer[..pos].trim().to_string();
                     buffer = buffer[pos + 1..].to_string();
 
-                    let Some(data) = line.strip_prefix("data: ") else {
-                        continue;
-                    };
+                    let Some(data) = line.strip_prefix("data: ") else { continue };
 
                     if data == "[DONE]" {
-                        let _ = app.emit("chat:done", ());
+                        let _ = app.emit(&done_event, ());
                         return Ok(());
                     }
 
                     if let Ok(obj) = serde_json::from_str::<serde_json::Value>(data) {
-                        // Delta text content
                         if let Some(content) = obj["choices"][0]["delta"]["content"].as_str() {
                             if !content.is_empty() {
-                                let _ = app.emit("chat:chunk", content);
+                                let _ = app.emit(&chunk_event, content);
                             }
                         }
-
-                        // Usage (present in the last chunk for some providers)
                         if let Some(usage) = obj.get("usage").filter(|u| !u.is_null()) {
-                            let prompt = usage["prompt_tokens"].as_u64().unwrap_or(0);
+                            let prompt     = usage["prompt_tokens"].as_u64().unwrap_or(0);
                             let completion = usage["completion_tokens"].as_u64().unwrap_or(0);
                             if prompt > 0 || completion > 0 {
-                                let _ = app.emit("chat:usage", serde_json::json!({
+                                let _ = app.emit(&usage_event, serde_json::json!({
                                     "promptTokens": prompt,
                                     "completionTokens": completion,
                                 }));
@@ -124,7 +155,6 @@ async fn stream_chat(
         }
     }
 
-    // Stream ended without an explicit [DONE] line
-    let _ = app.emit("chat:done", ());
+    let _ = app.emit(&done_event, ());
     Ok(())
 }

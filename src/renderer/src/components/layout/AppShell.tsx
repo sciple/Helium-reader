@@ -6,7 +6,9 @@ import ShortcutsOverlay from '../chrome/ShortcutsOverlay'
 import Sidebar from './Sidebar'
 import SplitPane from './SplitPane'
 import ChatPanel from '../chat/ChatPanel'
+import TransformPanel from '../transform/TransformPanel'
 import { useUiStore } from '../../store/uiStore'
+import { useTransformStore } from '../../store/transformStore'
 
 export default function AppShell() {
   const sidebarVisible = useUiStore((s) => s.sidebarVisible)
@@ -16,32 +18,48 @@ export default function AppShell() {
   const setChatPanelWidth = useUiStore((s) => s.setChatPanelWidth)
   const shortcutsVisible = useUiStore((s) => s.shortcutsVisible)
   const setShortcutsVisible = useUiStore((s) => s.setShortcutsVisible)
+  const transformPanelHeight = useUiStore((s) => s.transformPanelHeight)
+  const setTransformPanelHeight = useUiStore((s) => s.setTransformPanelHeight)
+  const transformOpen = useTransformStore((s) => s.isOpen)
 
-  const isDragging = useRef(false)
-  const startX = useRef(0)
-  const startWidth = useRef(0)
+  // ── Chat panel drag ───────────────────────────────────────────────────────
+  const chatDragging = useRef(false)
+  const chatStartX = useRef(0)
+  const chatStartWidth = useRef(0)
 
-  const onDividerPointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      isDragging.current = true
-      startX.current = e.clientX
-      startWidth.current = chatPanelWidth
-      ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-    },
-    []
-  )
+  const onChatDividerDown = useCallback((e: React.PointerEvent) => {
+    chatDragging.current = true
+    chatStartX.current = e.clientX
+    chatStartWidth.current = chatPanelWidth
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }, [chatPanelWidth])
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!isDragging.current) return
-      const delta = startX.current - e.clientX
-      setChatPanelWidth(startWidth.current + delta)
-    },
-    [setChatPanelWidth]
-  )
+  // ── Transform panel drag ──────────────────────────────────────────────────
+  const transformDragging = useRef(false)
+  const transformStartY = useRef(0)
+  const transformStartHeight = useRef(0)
+
+  const onTransformDividerDown = useCallback((e: React.PointerEvent) => {
+    transformDragging.current = true
+    transformStartY.current = e.clientY
+    transformStartHeight.current = transformPanelHeight
+    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
+  }, [transformPanelHeight])
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    if (chatDragging.current) {
+      const delta = chatStartX.current - e.clientX
+      setChatPanelWidth(chatStartWidth.current + delta)
+    }
+    if (transformDragging.current) {
+      const delta = transformStartY.current - e.clientY
+      setTransformPanelHeight(transformStartHeight.current + delta)
+    }
+  }, [setChatPanelWidth, setTransformPanelHeight])
 
   const onPointerUp = useCallback(() => {
-    isDragging.current = false
+    chatDragging.current = false
+    transformDragging.current = false
   }, [])
 
   return (
@@ -51,23 +69,30 @@ export default function AppShell() {
       onPointerUp={onPointerUp}
     >
       <TitleBar />
-      <div className="app-shell__body">
-        {!focusMode && sidebarVisible && (
-          <div className="app-shell__sidebar">
-            <Sidebar />
+      <div className="app-shell__content">
+        <div className="app-shell__body">
+          {!focusMode && sidebarVisible && (
+            <div className="app-shell__sidebar">
+              <Sidebar />
+            </div>
+          )}
+          <div className="app-shell__main">
+            <SplitPane />
           </div>
-        )}
-        <div className="app-shell__main">
-          <SplitPane />
+          {!focusMode && chatPanelVisible && (
+            <>
+              <div className="app-shell__chat-divider" onPointerDown={onChatDividerDown} />
+              <div className="app-shell__chat" style={{ width: chatPanelWidth }}>
+                <ChatPanel />
+              </div>
+            </>
+          )}
         </div>
-        {!focusMode && chatPanelVisible && (
+        {!focusMode && transformOpen && (
           <>
-            <div
-              className="app-shell__chat-divider"
-              onPointerDown={onDividerPointerDown}
-            />
-            <div className="app-shell__chat" style={{ width: chatPanelWidth }}>
-              <ChatPanel />
+            <div className="app-shell__transform-divider" onPointerDown={onTransformDividerDown} />
+            <div className="app-shell__transform" style={{ height: transformPanelHeight }}>
+              <TransformPanel />
             </div>
           </>
         )}

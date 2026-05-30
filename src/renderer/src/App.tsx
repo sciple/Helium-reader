@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import AppShell from './components/layout/AppShell'
 import { useEditorStore } from './store/editorStore'
 import { useUiStore } from './store/uiStore'
+import { useTransformStore } from './store/transformStore'
 import { useFileSystem } from './hooks/useFileSystem'
 import { useFocusMode } from './hooks/useFocusMode'
 
@@ -77,6 +78,16 @@ export default function App() {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'l') {
         e.preventDefault()
         handleToggleChat()
+      }
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 't') {
+        e.preventDefault()
+        const store = useTransformStore.getState()
+        if (store.isOpen) {
+          store.close()
+          window.dispatchEvent(new CustomEvent('focus-editor'))
+        } else {
+          store.open()
+        }
       }
       if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         const tag = (document.activeElement?.tagName ?? '').toLowerCase()

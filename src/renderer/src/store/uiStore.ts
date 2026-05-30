@@ -38,6 +38,8 @@ interface UiState {
   setChatPanelWidth: (w: number) => void
   toggleShortcuts: () => void
   setShortcutsVisible: (v: boolean) => void
+  transformPanelHeight: number
+  setTransformPanelHeight: (h: number) => void
 }
 
 export const useUiStore = create<UiState>((set) => ({
@@ -73,4 +75,6 @@ export const useUiStore = create<UiState>((set) => ({
   setChatPanelWidth: (w) => set({ chatPanelWidth: Math.max(240, Math.min(600, w)) }),
   toggleShortcuts: () => set((s) => ({ shortcutsVisible: !s.shortcutsVisible })),
   setShortcutsVisible: (v) => set({ shortcutsVisible: v }),
+  transformPanelHeight: 220,
+  setTransformPanelHeight: (h) => set({ transformPanelHeight: Math.max(140, Math.min(400, h)) }),
 }))

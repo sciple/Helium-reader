@@ -43,6 +43,20 @@ export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | nul
     return () => window.removeEventListener('focus-editor', handler)
   }, [])
 
+  // Replace current selection with text from the transform panel
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const view = viewRef.current
+      if (!view) return
+      const text = (e as CustomEvent<string>).detail
+      const { from, to } = view.state.selection.main
+      view.dispatch({ changes: { from, to, insert: text }, selection: { anchor: from } })
+      view.focus()
+    }
+    window.addEventListener('editor:replace-selection', handler)
+    return () => window.removeEventListener('editor:replace-selection', handler)
+  }, [])
+
   // Swap CM theme when colorTheme changes
   useEffect(() => {
     const view = viewRef.current

@@ -18,4 +18,5 @@ pub struct AppState {
     pub watchers: Watchers,
     pub ctx_pending: Mutex<Option<oneshot::Sender<Option<String>>>>,
     pub chat_handle: Mutex<Option<JoinHandle<()>>>,
+    pub transform_handle: Mutex<Option<JoinHandle<()>>>,
 }
