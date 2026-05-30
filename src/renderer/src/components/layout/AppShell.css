@@ -1,0 +1,51 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.app-shell__body {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+}
+
+.app-shell__sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.2s ease;
+}
+
+.app-shell__main {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-shell__chat {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.app-shell__chat-divider {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--color-divider);
+  cursor: col-resize;
+  transition: background 0.15s;
+}
+.app-shell__chat-divider:hover {
+  background: var(--color-accent);
+}
+
+.app-shell--focus .app-shell__body {
+  justify-content: center;
+}
+
+.app-shell--focus .app-shell__main {
+  max-width: 800px;
+}

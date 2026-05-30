@@ -1,0 +1,27 @@
+.file-tree {
+  overflow-y: auto;
+  height: 100%;
+  padding: 4px 0;
+}
+
+.file-tree__new-folder-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin: 1px 4px;
+  padding-right: 8px;
+}
+
+.file-tree__new-folder-input {
+  flex: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  border-radius: 3px;
+  color: var(--color-text);
+  font-size: 0.85em;
+  font-family: inherit;
+  padding: 2px 6px;
+  outline: none;
+  min-width: 0;
+}

@@ -1,0 +1,63 @@
+import { useEffect, useRef } from 'react'
+import { EditorView } from '@codemirror/view'
+import { EditorState } from '@codemirror/state'
+import { buildExtensions, themeCompartment } from './extensions'
+import { getThemeExtensions } from '../../styles/codemirror-theme'
+import { useEditorStore } from '../../store/editorStore'
+import { useUiStore } from '../../store/uiStore'
+
+export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | null>) {
+  const viewRef = useRef<EditorView | null>(null)
+  const content = useEditorStore((s) => s.content)
+  const currentFilePath = useEditorStore((s) => s.currentFilePath)
+  const colorTheme = useUiStore((s) => s.colorTheme)
+
+  // Initialize CM once
+  useEffect(() => {
+    if (!containerRef.current || viewRef.current) return
+
+    const view = new EditorView({
+      state: EditorState.create({
+        doc: content,
+        extensions: buildExtensions(
+          (value) => useEditorStore.getState().updateContent(value),
+          (size, text) => useEditorStore.getState().updateSelection(size, text),
+          useUiStore.getState().colorTheme === 'dark'
+        )
+      }),
+      parent: containerRef.current
+    })
+    viewRef.current = view
+
+    return () => {
+      view.destroy()
+      viewRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerRef])
+
+  // Swap CM theme when colorTheme changes
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) return
+    view.dispatch({
+      effects: themeCompartment.reconfigure(getThemeExtensions(colorTheme === 'dark'))
+    })
+  }, [colorTheme])
+
+  // Sync external content changes (file open) without triggering the updateListener
+  const lastExternalPath = useRef<string | null>(null)
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) return
+    if (currentFilePath === lastExternalPath.current) return
+    lastExternalPath.current = currentFilePath
+
+    const currentDoc = view.state.doc.toString()
+    if (currentDoc !== content) {
+      view.dispatch({
+        changes: { from: 0, to: currentDoc.length, insert: content }
+      })
+    }
+  }, [currentFilePath, content])
+}

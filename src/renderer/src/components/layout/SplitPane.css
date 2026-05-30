@@ -1,0 +1,28 @@
+.split-pane {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+}
+
+.split-pane__editor {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.split-pane__preview {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.split-pane__divider {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--color-divider);
+  cursor: col-resize;
+  transition: background 0.15s;
+}
+.split-pane__divider:hover {
+  background: var(--color-accent);
+}

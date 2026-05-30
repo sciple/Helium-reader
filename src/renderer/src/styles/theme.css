@@ -1,0 +1,42 @@
+:root {
+  --color-bg: #1a1a1a;
+  --color-surface: #222222;
+  --color-surface-hover: #2a2a2a;
+  --color-border: #333333;
+  --color-text: #e0e0e0;
+  --color-text-muted: #888888;
+  --color-text-faint: #555555;
+  --color-accent: #38bdf8;
+  --color-accent-dim: rgba(56, 189, 248, 0.15);
+  --color-selection: rgba(56, 189, 248, 0.25);
+  --color-scrollbar: #3a3a3a;
+  --color-titlebar: #141414;
+  --color-statusbar: #141414;
+  --color-sidebar: #1e1e1e;
+  --color-divider: #2e2e2e;
+
+  --sidebar-width: 240px;
+  --titlebar-height: 36px;
+  --statusbar-height: 24px;
+
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+  --font-prose: 'Georgia', 'Cambria', serif;
+}
+
+[data-theme="light"] {
+  --color-bg: #f9f9f7;
+  --color-surface: #f0f0ee;
+  --color-surface-hover: #e8e8e6;
+  --color-border: #d4d4d0;
+  --color-text: #1a1a1a;
+  --color-text-muted: #666666;
+  --color-text-faint: #aaaaaa;
+  --color-accent: #0ea5e9;
+  --color-accent-dim: rgba(14, 165, 233, 0.12);
+  --color-selection: rgba(14, 165, 233, 0.18);
+  --color-scrollbar: #c8c8c4;
+  --color-titlebar: #ededeb;
+  --color-statusbar: #ededeb;
+  --color-sidebar: #f0f0ee;
+  --color-divider: #d4d4d0;
+}

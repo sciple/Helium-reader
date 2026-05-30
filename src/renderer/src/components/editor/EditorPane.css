@@ -1,0 +1,13 @@
+.editor-pane {
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.editor-pane .cm-editor {
+  height: 100%;
+}
+
+.editor-pane .cm-scroller {
+  overflow-y: auto;
+}

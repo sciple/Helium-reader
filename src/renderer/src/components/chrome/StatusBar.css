@@ -1,0 +1,24 @@
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--statusbar-height);
+  background: var(--color-statusbar);
+  border-top: 1px solid var(--color-border);
+  padding: 0 12px;
+  flex-shrink: 0;
+  font-size: 0.8em;
+  color: var(--color-text-faint);
+  overflow: hidden;
+}
+
+.statusbar__path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.statusbar__dirty { color: var(--color-accent); }
+
+.statusbar__stats { white-space: nowrap; color: var(--color-text-muted); }
