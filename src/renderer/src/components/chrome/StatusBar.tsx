@@ -10,6 +10,11 @@ function sentenceCount(text: string): number {
   return Math.max(1, matches?.length ?? 0)
 }
 
+function readingTime(text: string): string {
+  const mins = Math.ceil(wordCount(text) / 200)
+  return mins < 1 ? '< 1 min read' : `${mins} min read`
+}
+
 export default function StatusBar() {
   const content = useEditorStore((s) => s.content)
   const isDirty = useEditorStore((s) => s.isDirty)
@@ -30,6 +35,7 @@ export default function StatusBar() {
       </span>
       <span className="statusbar__stats">
         {words} words · {chars} chars
+        {!hasSelection && <> · {readingTime(content)}</>}
         {sentences !== null && <> · ~{sentences} sentence{sentences !== 1 ? 's' : ''}</>}
       </span>
       {hasSelection && (
