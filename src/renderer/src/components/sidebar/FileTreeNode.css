@@ -61,3 +61,25 @@
 .file-tree-node__row--creating {
   pointer-events: none;
 }
+
+.file-tree-node__pin-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-text-faint);
+  cursor: pointer;
+  padding: 0 3px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+.file-tree-node__row:hover .file-tree-node__pin-btn { display: flex; }
+.file-tree-node__pin-btn--active {
+  display: flex;
+  color: var(--color-accent);
+}
+.file-tree-node__pin-btn:hover {
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { useEditorStore } from './editorStore'
+import { useFileSystemStore } from './fileSystemStore'
 
 export interface ChatMessage {
   id: string
@@ -26,6 +27,14 @@ interface ChatState {
   removeMessage: (id: string) => void
   includeDocument: boolean
   toggleIncludeDocument: () => void
+  pinnedByRoot: Record<string, string[]>
+  togglePin: (rootPath: string, filePath: string) => void
+  clearPins: (rootPath: string) => void
+}
+
+function parsePinnedByRoot(raw: string | null): Record<string, string[]> {
+  if (!raw) return {}
+  try { return JSON.parse(raw) as Record<string, string[]> } catch { return {} }
 }
 
 function parseContextWindow(raw: string | null): number | null {
@@ -44,6 +53,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   contextUsed: 0,
   _cleanup: null,
   includeDocument: false,
+  pinnedByRoot: parsePinnedByRoot(localStorage.getItem('chatPinnedByRoot')),
 
   sendMessage: async (userText, contextText) => {
     if (get().isStreaming) return
@@ -66,7 +76,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
 
     // Capture state before adding new messages to build the API payload
-    const { lmStudioUrl, model, systemPrompt, messages: history, includeDocument } = get()
+    const { lmStudioUrl, model, systemPrompt, messages: history, includeDocument, pinnedByRoot } = get()
     const { content: docContent, currentFilePath } = useEditorStore.getState()
     const fileName = currentFilePath?.split('/').pop() ?? 'document'
 
@@ -75,11 +85,24 @@ export const useChatStore = create<ChatState>((set, get) => ({
       isStreaming: true
     }))
 
+    const rootPath = useFileSystemStore.getState().rootPath
+    const pins = rootPath ? (pinnedByRoot[rootPath] ?? []) : []
+    const toSend = pins.filter((p) => !(includeDocument && p === currentFilePath))
+    const pinnedDocs = (await Promise.all(
+      toSend.map(async (p) => {
+        try {
+          const r = await window.api.readFile(p)
+          return { name: p.split('/').pop() ?? p, content: r.content }
+        } catch { return null }
+      })
+    )).filter((d): d is { name: string; content: string } => d != null)
+
     const apiMessages = [
       ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
       ...(includeDocument && docContent
         ? [{ role: 'system' as const, content: `Document context — ${fileName}:\n\n${docContent}` }]
         : []),
+      ...pinnedDocs.map((d) => ({ role: 'system' as const, content: `Document context — ${d.name}:\n\n${d.content}` })),
       ...[...history, userMessage].map((m) => ({
         role: m.role as 'user' | 'assistant' | 'system',
         content: m.content
@@ -146,6 +169,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   removeMessage: (id) => set((s) => ({ messages: s.messages.filter((m) => m.id !== id), contextUsed: 0 })),
   toggleIncludeDocument: () => set((s) => ({ includeDocument: !s.includeDocument })),
+
+  togglePin: (rootPath, filePath) => set((s) => {
+    const current = s.pinnedByRoot[rootPath] ?? []
+    const next = current.includes(filePath)
+      ? current.filter((p) => p !== filePath)
+      : [...current, filePath]
+    const updated = { ...s.pinnedByRoot, [rootPath]: next }
+    localStorage.setItem('chatPinnedByRoot', JSON.stringify(updated))
+    return { pinnedByRoot: updated }
+  }),
+
+  clearPins: (rootPath) => set((s) => {
+    const updated = { ...s.pinnedByRoot, [rootPath]: [] }
+    localStorage.setItem('chatPinnedByRoot', JSON.stringify(updated))
+    return { pinnedByRoot: updated }
+  }),
 
   setContextWindow: (value) => {
     if (value != null) localStorage.setItem('lmStudioContextWindow', String(value))

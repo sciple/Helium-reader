@@ -265,6 +265,26 @@
   border-left: 2px solid var(--color-text-faint);
 }
 
+.chat-input__context-badge--pin {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-left: 2px solid var(--color-accent);
+}
+
+.chat-input__badge-remove {
+  background: none;
+  border: none;
+  color: var(--color-text-faint);
+  cursor: pointer;
+  font-size: 0.85em;
+  line-height: 1;
+  padding: 0 0 0 2px;
+  margin-left: auto;
+  transition: color 0.15s;
+}
+.chat-input__badge-remove:hover { color: var(--color-text); }
+
 .chat-input__row {
   display: flex;
   gap: 6px;
