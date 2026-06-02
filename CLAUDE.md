@@ -82,3 +82,4 @@ State is managed exclusively with **Zustand**. The five stores are:
 - **Markdown-only** — the file tree filters to `.md` files; the save dialog adds the `.md` extension filter.
 - **Streaming abort** — chat and transform tasks are tracked by handle in `AppState`; calling `chat_abort` / `transform_abort` drops the handle and cancels the Tauri task.
 - **Path aliases** — `@renderer` → `src/renderer/src`, `@shared` → `src/shared` (configured in both `vite.config.ts` and `tsconfig.json`).
+- **README updates** — when a significant user-facing feature is added, update [README.md](README.md) to reflect it.
