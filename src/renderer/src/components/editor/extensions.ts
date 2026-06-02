@@ -5,6 +5,7 @@ import { EditorView, drawSelection, highlightActiveLine, keymap } from '@codemir
 import { Compartment } from '@codemirror/state'
 import { getThemeExtensions } from '../../styles/codemirror-theme'
 import { spellCheckLinter } from './spellcheck'
+import { slashCommandExtension } from './slashCommands'
 
 export const themeCompartment = new Compartment()
 
@@ -22,6 +23,7 @@ export function buildExtensions(
     EditorView.lineWrapping,
     keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
     spellCheckLinter(),
+    slashCommandExtension(),
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         onChange(update.state.doc.toString())
