@@ -1,5 +1,5 @@
 {
-  "name": "helium-reader-tauri",
+  "name": "helium-reader",
   "version": "1.0.0",
   "description": "A Ghost-inspired markdown editor for Windows 11 (Tauri + Rust)",
   "scripts": {
