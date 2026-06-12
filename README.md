@@ -1,7 +1,10 @@
 # Helium Reader
 
-A Ghost-inspired markdown editor for Windows 11, built with Tauri 2 + Rust + React 19.
+A Ghost-inspired markdown editor for Windows 11, built with Tauri 2 + Rust + React 19. Integrates Local LLM as writing assistant.
 
+![image](docs\Helium-reader-logo.png)
+![image](docs\Helium-reader-screenshot.png)
+![image](docs\Helium-reader-screenshot_dark.png)
 ---
 
 ## Dependencies
