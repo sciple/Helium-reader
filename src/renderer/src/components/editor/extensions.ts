@@ -8,11 +8,13 @@ import { spellCheckLinter } from './spellcheck'
 import { slashCommandExtension } from './slashCommands'
 
 export const themeCompartment = new Compartment()
+export const spellCompartment = new Compartment()
 
 export function buildExtensions(
   onChange: (value: string) => void,
   onSelectionChange: (size: number, text: string) => void,
-  isDark = true
+  isDark = true,
+  spellCheck = true
 ) {
   return [
     markdown({ base: markdownLanguage, codeLanguages: languages }),
@@ -22,7 +24,7 @@ export function buildExtensions(
     highlightActiveLine(),
     EditorView.lineWrapping,
     keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
-    spellCheckLinter(),
+    spellCompartment.of(spellCheck ? spellCheckLinter() : []),
     slashCommandExtension(),
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {

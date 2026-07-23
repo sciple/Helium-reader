@@ -9,6 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Slash commands** — type `/` at the start of a line in the editor to open a command palette. Available commands: `/table` (3×3), `/table-2col`, `/table-4col`, `/code` (fenced block), `/callout` (blockquote), `/toc` (table of contents from headings), `/date` (today's date), `/hr` (horizontal rule).
+- **Spell-check toggle** — a switch in the status bar turns the editor's red spell-check underlines on or off, so you can write in languages the English dictionary doesn't cover (e.g. Italian) without every word being flagged. The setting is remembered across sessions.
 
 ---
 

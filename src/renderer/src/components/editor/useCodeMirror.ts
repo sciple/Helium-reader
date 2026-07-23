@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { EditorView } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
-import { buildExtensions, themeCompartment } from './extensions'
+import { buildExtensions, themeCompartment, spellCompartment } from './extensions'
+import { spellCheckLinter } from './spellcheck'
 import { getThemeExtensions } from '../../styles/codemirror-theme'
 import { useEditorStore } from '../../store/editorStore'
 import { useUiStore } from '../../store/uiStore'
@@ -11,6 +12,7 @@ export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | nul
   const content = useEditorStore((s) => s.content)
   const currentFilePath = useEditorStore((s) => s.currentFilePath)
   const colorTheme = useUiStore((s) => s.colorTheme)
+  const spellCheckEnabled = useUiStore((s) => s.spellCheckEnabled)
 
   // Initialize CM once
   useEffect(() => {
@@ -22,7 +24,8 @@ export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | nul
         extensions: buildExtensions(
           (value) => useEditorStore.getState().updateContent(value),
           (size, text) => useEditorStore.getState().updateSelection(size, text),
-          useUiStore.getState().colorTheme === 'dark'
+          useUiStore.getState().colorTheme === 'dark',
+          useUiStore.getState().spellCheckEnabled
         )
       }),
       parent: containerRef.current
@@ -87,6 +90,15 @@ export function useCodeMirror(containerRef: React.RefObject<HTMLDivElement | nul
       effects: themeCompartment.reconfigure(getThemeExtensions(colorTheme === 'dark'))
     })
   }, [colorTheme])
+
+  // Turn spell-check underlines on/off without rebuilding the editor
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) return
+    view.dispatch({
+      effects: spellCompartment.reconfigure(spellCheckEnabled ? spellCheckLinter() : [])
+    })
+  }, [spellCheckEnabled])
 
   // Sync external content changes (file open) without triggering the updateListener
   const lastExternalPath = useRef<string | null>(null)

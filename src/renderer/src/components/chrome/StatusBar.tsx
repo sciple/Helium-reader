@@ -1,5 +1,6 @@
 import './StatusBar.css'
 import { useEditorStore } from '../../store/editorStore'
+import { useUiStore } from '../../store/uiStore'
 
 function wordCount(text: string): number {
   return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
@@ -21,6 +22,8 @@ export default function StatusBar() {
   const currentFilePath = useEditorStore((s) => s.currentFilePath)
   const selectionSize = useEditorStore((s) => s.selectionSize)
   const selectedText = useEditorStore((s) => s.selectedText)
+  const spellCheckEnabled = useUiStore((s) => s.spellCheckEnabled)
+  const toggleSpellCheck = useUiStore((s) => s.toggleSpellCheck)
 
   const hasSelection = selectionSize > 0
   const words = wordCount(hasSelection ? selectedText : content)
@@ -45,6 +48,20 @@ export default function StatusBar() {
           <kbd>Ctrl+Shift+T</kbd> transform
         </span>
       )}
+      <button
+        type="button"
+        className={`statusbar__spell${spellCheckEnabled ? ' is-on' : ''}`}
+        onClick={toggleSpellCheck}
+        aria-pressed={spellCheckEnabled}
+        title={
+          spellCheckEnabled
+            ? 'Spell check on — click to hide the red underlines (e.g. when writing in Italian)'
+            : 'Spell check off — click to re-enable English spell check'
+        }
+      >
+        <span className="statusbar__switch" aria-hidden="true" />
+        Spellcheck
+      </button>
     </div>
   )
 }

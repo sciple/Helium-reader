@@ -21,6 +21,8 @@ interface UiState {
   chatPanelVisible: boolean
   chatPanelWidth: number
   shortcutsVisible: boolean
+  spellCheckEnabled: boolean
+  toggleSpellCheck: () => void
   toggleSidebar: () => void
   setSidebarVisible: (v: boolean) => void
   toggleFocusMode: () => void
@@ -55,7 +57,16 @@ export const useUiStore = create<UiState>((set) => ({
   chatPanelVisible: false,
   chatPanelWidth: 340,
   shortcutsVisible: false,
+  // Persisted: off means the editor's red spell-check underlines are hidden
+  // (e.g. when writing in a language the English dictionary doesn't cover).
+  spellCheckEnabled: localStorage.getItem('spellCheckEnabled') !== 'false',
 
+  toggleSpellCheck: () =>
+    set((s) => {
+      const next = !s.spellCheckEnabled
+      localStorage.setItem('spellCheckEnabled', String(next))
+      return { spellCheckEnabled: next }
+    }),
   toggleSidebar: () => set((s) => ({ sidebarVisible: !s.sidebarVisible })),
   setSidebarVisible: (v) => set({ sidebarVisible: v }),
   toggleFocusMode: () => set((s) => ({ focusMode: !s.focusMode })),
