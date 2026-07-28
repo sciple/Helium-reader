@@ -12,6 +12,14 @@
   overflow-y: auto;
 }
 
+/* ── Image drag-and-drop target ── */
+
+.editor-pane .cm-editor.cm-image-drop-active {
+  outline: 2px dashed var(--color-accent);
+  outline-offset: -4px;
+  background: var(--color-accent-dim);
+}
+
 /* ── Slash command autocomplete popup ── */
 
 .cm-tooltip.cm-tooltip-autocomplete {

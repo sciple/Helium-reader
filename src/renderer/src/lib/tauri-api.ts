@@ -5,6 +5,7 @@ import type {
   FileEntry,
   ReadFileResult,
   WriteFileResult,
+  SaveMediaResult,
   FileChangedPayload,
   ConfirmDiscardResult,
   ChatUsage,
@@ -65,6 +66,9 @@ const api: WindowApi = {
 
   writeFile: (path, content) =>
     invoke<WriteFileResult>('write_file', { path, content }),
+
+  saveMediaImage: (dir, fileName, data) =>
+    invoke<SaveMediaResult>('save_media_image', { dir, fileName, data }),
 
   watchFolder: (path) =>
     invoke<void>('watch_folder', { path }),

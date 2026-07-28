@@ -44,6 +44,7 @@ pub fn run() {
             commands::fs::create_directory,
             commands::fs::create_file,
             commands::fs::rename_file,
+            commands::media::save_media_image,
             commands::dialog::open_folder_dialog,
             commands::dialog::save_as_dialog,
             commands::dialog::confirm_discard,

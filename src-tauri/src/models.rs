@@ -44,3 +44,10 @@ pub struct RenameResult {
     pub new_path: String,
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SaveMediaResult {
+    pub path: String,
+    pub file_name: String,
+}
+

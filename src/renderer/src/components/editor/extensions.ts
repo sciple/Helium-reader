@@ -6,6 +6,7 @@ import { Compartment } from '@codemirror/state'
 import { getThemeExtensions } from '../../styles/codemirror-theme'
 import { spellCheckLinter } from './spellcheck'
 import { slashCommandExtension } from './slashCommands'
+import { imageDropPaste } from './imageDropPaste'
 
 export const themeCompartment = new Compartment()
 export const spellCompartment = new Compartment()
@@ -26,6 +27,7 @@ export function buildExtensions(
     keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
     spellCompartment.of(spellCheck ? spellCheckLinter() : []),
     slashCommandExtension(),
+    imageDropPaste(),
     EditorView.updateListener.of((update) => {
       if (update.docChanged) {
         onChange(update.state.doc.toString())
