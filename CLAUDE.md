@@ -84,3 +84,17 @@ State is managed exclusively with **Zustand**. The five stores are:
 - **Path aliases** — `@renderer` → `src/renderer/src`, `@shared` → `src/shared` (configured in both `vite.config.ts` and `tsconfig.json`).
 - **README updates** — when a significant user-facing feature is added, update [README.md](README.md) to reflect it.
 - **Changelog updates** — add a line under `## [Unreleased]` in [CHANGELOG.md](CHANGELOG.md) for every new feature or notable fix.
+
+## Revert Points
+
+Feature work is merged with `--no-ff` and preceded by a tag on the pre-feature tip, so each feature has a single handle to revert by.
+
+**Image drag-and-drop / paste** — merge commit `ffb3f1e`, tag `pre-image-drop` (= `d9629e3`, the state before the feature):
+
+```bash
+git revert -m 1 ffb3f1e              # undo the whole feature, keeps history
+git diff pre-image-drop master       # see everything it changed
+git reset --hard pre-image-drop      # rewind master completely (safe while unpushed)
+```
+
+Reverting a merge and later wanting the feature back requires reverting the revert — Git will not re-merge commits it considers already merged.
