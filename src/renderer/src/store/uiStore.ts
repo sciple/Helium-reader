@@ -50,7 +50,7 @@ export const useUiStore = create<UiState>((set) => ({
   previewVisible: false,
   previewFont: 'mono',
   colorTheme: 'light',
-  editorFontSize: 15,
+  editorFontSize: 17,
   proseWidth: 'default',
   splitRatio: 0.5,
   newFileRequested: false,

@@ -49,7 +49,7 @@ export default function TitleBar() {
           aria-label="Toggle color theme"
         >
           {colorTheme === 'dark' ? (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <circle cx="7" cy="7" r="3" fill="currentColor"/>
               <line x1="7" y1="1" x2="7" y2="2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               <line x1="7" y1="11.5" x2="7" y2="13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -61,7 +61,7 @@ export default function TitleBar() {
               <line x1="4" y1="10" x2="2.93" y2="11.07" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
           ) : (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
               <path d="M7 2a5 5 0 1 0 5 5 5 5 0 0 0-4-4.9A3.5 3.5 0 0 1 7 2z" fill="currentColor"/>
             </svg>
           )}
@@ -72,7 +72,7 @@ export default function TitleBar() {
           title="Toggle preview (Ctrl+\)"
           aria-label="Toggle preview"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <rect x="1" y="1" width="5" height="12" rx="1" fill="currentColor" opacity="0.9"/>
             <rect x="8" y="1" width="5" height="12" rx="1" fill="currentColor" opacity={previewVisible ? '0.9' : '0.25'}/>
           </svg>
@@ -83,7 +83,7 @@ export default function TitleBar() {
           title="Toggle chat (Ctrl+Shift+L)"
           aria-label="Toggle chat panel"
         >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 14 14" fill="none" aria-hidden="true">
             <path d="M1 2a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H8l-3 3v-3H2a1 1 0 0 1-1-1V2z"
               fill="currentColor" opacity={chatPanelVisible ? '0.9' : '0.35'}/>
           </svg>
