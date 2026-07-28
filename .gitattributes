@@ -1,0 +1,18 @@
+# Normalize line endings so Git doesn't rely on each machine's core.autocrlf,
+# which caused spurious "LF will be replaced by CRLF" warnings on Windows.
+* text=auto eol=lf
+
+# Windows-only scripts should keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets — never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
