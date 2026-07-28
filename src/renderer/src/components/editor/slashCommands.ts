@@ -74,6 +74,28 @@ const COMMANDS: SlashCommand[] = [
     }
   },
   {
+    label: '/math',
+    detail: 'Centered equation block',
+    apply: (view, from, to) => {
+      const text = '$$\n\n$$'
+      view.dispatch({
+        changes: { from, to, insert: text },
+        selection: { anchor: from + 3 }
+      })
+    }
+  },
+  {
+    label: '/imath',
+    detail: 'Inline math',
+    apply: (view, from, to) => {
+      const text = '$$'
+      view.dispatch({
+        changes: { from, to, insert: text },
+        selection: { anchor: from + 1 }
+      })
+    }
+  },
+  {
     label: '/callout',
     detail: 'Blockquote callout',
     apply: (view, from, to) => {

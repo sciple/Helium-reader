@@ -101,3 +101,20 @@
 }
 
 .preview-content img { max-width: 100%; border-radius: 4px; }
+
+/* Math (KaTeX) — colour is inherited from --color-text, so both themes work as-is. */
+.preview-content .katex {
+  font-size: 1.05em;
+}
+
+.preview-content .katex-display {
+  margin: 1.25em 0;
+  padding: 0.25em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.preview-content .katex-error {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}

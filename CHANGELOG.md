@@ -8,8 +8,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Math notation** — write LaTeX inline with `$E = mc^2$` (or `$$E = mc^2$$`) and centered display equations with `$$` on their own lines; a ` ```math ` fenced block works too. Rendered in the preview by KaTeX, whose fonts are bundled with the app, so it works fully offline. A malformed expression shows its raw source in red with the parse error as a tooltip instead of breaking the preview. Literal dollar amounts in a sentence need escaping as `\$`.
 - **Drag-and-drop and paste images** — drop an image file onto the editor, or paste one straight from the Snipping Tool (`Win+Shift+S` → `Ctrl+V`). The file is copied into a `media/` folder at the root of the open folder (created on first use) and markdown image syntax is inserted at the drop point or cursor. Dropped files keep their original name, deduplicated with `-1`, `-2`, …; pasted screenshots are named `pasted-YYYYMMDD-HHMMSS.png`.
-- **Slash commands** — type `/` at the start of a line in the editor to open a command palette. Available commands: `/table` (3×3), `/table-2col`, `/table-4col`, `/code` (fenced block), `/callout` (blockquote), `/toc` (table of contents from headings), `/date` (today's date), `/hr` (horizontal rule).
+- **Slash commands** — type `/` at the start of a line in the editor to open a command palette. Available commands: `/table` (3×3), `/table-2col`, `/table-4col`, `/code` (fenced block), `/callout` (blockquote), `/toc` (table of contents from headings), `/date` (today's date), `/hr` (horizontal rule), `/math` (centered equation block), `/imath` (inline math).
 - **Spell-check toggle** — a switch in the status bar turns the editor's red spell-check underlines on or off, so you can write in languages the English dictionary doesn't cover (e.g. Italian) without every word being flagged. The setting is remembered across sessions.
 
 ### Fixed

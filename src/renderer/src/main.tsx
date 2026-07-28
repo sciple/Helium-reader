@@ -1,6 +1,7 @@
 import './lib/tauri-api'
 import './styles/global.css'
 import './styles/theme.css'
+import 'katex/dist/katex.min.css'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'

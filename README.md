@@ -81,6 +81,30 @@ Drop an image file onto the editor, or paste one from the clipboard — includin
 - Pasted screenshots have no name of their own, so they are saved as `pasted-YYYYMMDD-HHMMSS.png`.
 - Notes in subfolders get a correct relative link (`../media/shot.png`).
 
+### Math notation
+
+Write LaTeX between dollar signs and it renders in the preview pane.
+
+| What you write | What you get |
+|---|---|
+| `$E = mc^2$` or `$$E = mc^2$$` | inline math, on the text baseline |
+| `$$` on its own line, LaTeX, then `$$` | a centered equation on its own line |
+| a ` ```math ` fenced block | same as the centered form |
+
+```markdown
+The relation $E = mc^2$ follows from:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}
+$$
+```
+
+Type `/math` on an empty line for a centered block, or `/imath` for inline.
+
+- Rendering uses **KaTeX**, bundled with the app — no internet connection needed.
+- Because a single `$` opens inline math, write literal dollar amounts as `\$5`, not `$5`.
+- A malformed expression shows its raw source in red, with the parse error on hover; the rest of the document still renders.
+
 ### Document outline
 
 When a file is open, the **Outline** section at the top of the sidebar lists all headings (H1–H6). Click any heading to scroll both the preview pane and the editor to that section. Click **▾ Outline** to collapse or expand the panel.
