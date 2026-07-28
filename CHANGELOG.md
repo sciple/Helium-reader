@@ -8,8 +8,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Drag-and-drop and paste images** — drop an image file onto the editor, or paste one straight from the Snipping Tool (`Win+Shift+S` → `Ctrl+V`). The file is copied into a `media/` folder at the root of the open folder (created on first use) and markdown image syntax is inserted at the drop point or cursor. Dropped files keep their original name, deduplicated with `-1`, `-2`, …; pasted screenshots are named `pasted-YYYYMMDD-HHMMSS.png`.
 - **Slash commands** — type `/` at the start of a line in the editor to open a command palette. Available commands: `/table` (3×3), `/table-2col`, `/table-4col`, `/code` (fenced block), `/callout` (blockquote), `/toc` (table of contents from headings), `/date` (today's date), `/hr` (horizontal rule).
 - **Spell-check toggle** — a switch in the status bar turns the editor's red spell-check underlines on or off, so you can write in languages the English dictionary doesn't cover (e.g. Italian) without every word being flagged. The setting is remembered across sessions.
+
+### Fixed
+- Relative image paths in the preview now resolve against the open document's own folder instead of the folder root, so images referenced from a note in a subfolder render correctly.
 
 ---
 

@@ -3,6 +3,7 @@ import { useCallback, useRef } from 'react'
 import TitleBar from '../chrome/TitleBar'
 import StatusBar from '../chrome/StatusBar'
 import ShortcutsOverlay from '../chrome/ShortcutsOverlay'
+import Notice from '../chrome/Notice'
 import Sidebar from './Sidebar'
 import SplitPane from './SplitPane'
 import ChatPanel from '../chat/ChatPanel'
@@ -99,6 +100,7 @@ export default function AppShell() {
       </div>
       {!focusMode && <StatusBar />}
       {shortcutsVisible && <ShortcutsOverlay onClose={() => setShortcutsVisible(false)} />}
+      <Notice />
     </div>
   )
 }

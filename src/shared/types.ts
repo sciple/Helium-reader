@@ -16,6 +16,11 @@ export interface WriteFileResult {
   path: string
 }
 
+export interface SaveMediaResult {
+  path: string
+  fileName: string
+}
+
 export interface FileChangedPayload {
   path: string
   event: 'add' | 'change' | 'unlink'
@@ -46,6 +51,8 @@ export interface WindowApi {
   readDirectory: (path: string, depth: number) => Promise<FileEntry[]>
   readFile: (path: string) => Promise<ReadFileResult>
   writeFile: (path: string, content: string) => Promise<WriteFileResult>
+  /** Write base64-encoded image bytes into `dir`, creating it if needed. Returns the deduped path. */
+  saveMediaImage: (dir: string, fileName: string, data: string) => Promise<SaveMediaResult>
   watchFolder: (path: string) => Promise<void>
   unwatchFolder: (path: string) => Promise<void>
   onFileChanged: (cb: (payload: FileChangedPayload) => void) => () => void

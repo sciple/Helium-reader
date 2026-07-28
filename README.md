@@ -73,6 +73,14 @@ The left pane is a full markdown editor. Toggle the preview pane with `Ctrl+\`.
 | Focus mode (fullscreen) | `F11` |
 | Keyboard shortcuts overlay | `?` |
 
+### Images
+
+Drop an image file onto the editor, or paste one from the clipboard — including a screenshot taken with the Snipping Tool (`Win+Shift+S`, then `Ctrl+V` in the editor). Helium Reader copies the image into a **`media/`** folder at the root of the open folder, creating it the first time, and inserts the markdown link for you at the drop point or cursor.
+
+- Dropped files keep their original name; a name that already exists gets `-1`, `-2`, … appended.
+- Pasted screenshots have no name of their own, so they are saved as `pasted-YYYYMMDD-HHMMSS.png`.
+- Notes in subfolders get a correct relative link (`../media/shot.png`).
+
 ### Document outline
 
 When a file is open, the **Outline** section at the top of the sidebar lists all headings (H1–H6). Click any heading to scroll both the preview pane and the editor to that section. Click **▾ Outline** to collapse or expand the panel.
