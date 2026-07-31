@@ -27,6 +27,7 @@ const MENU_EVENTS = [
   'menu:open-folder',
   'menu:save',
   'menu:save-as',
+  'menu:export-pdf',
   'menu:toggle-sidebar',
   'menu:toggle-focus',
   'menu:toggle-preview',

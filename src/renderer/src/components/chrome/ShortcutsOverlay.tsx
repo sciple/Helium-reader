@@ -21,6 +21,7 @@ const SECTIONS = [
     rows: [
       ['Ctrl+S',         'Save'],
       ['Ctrl+Shift+S',   'Save As'],
+      ['Ctrl+P',         'Export to PDF'],
       ['Ctrl+Shift+O',   'Open folder'],
       ['Ctrl+N',         'New file'],
       ['Ctrl+Z',         'Undo'],

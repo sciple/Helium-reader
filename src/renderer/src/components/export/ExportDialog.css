@@ -1,0 +1,297 @@
+.export-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.export-dialog {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  width: min(880px, 94vw);
+  max-height: 88vh;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+}
+
+.export-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.export-dialog__title {
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--color-text);
+}
+
+.export-dialog__close {
+  background: none;
+  border: none;
+  color: var(--color-text-faint);
+  cursor: pointer;
+  font-size: 1em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.export-dialog__close:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.export-dialog__body {
+  display: flex;
+  gap: 24px;
+  padding: 18px 22px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────────── */
+
+.export-dialog__controls {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.export-dialog__group-title {
+  font-size: 0.7em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-faint);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--color-border);
+}
+.export-dialog__group-title:not(:first-child) {
+  margin-top: 8px;
+}
+
+.export-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.export-dialog__label {
+  font-size: 0.78em;
+  color: var(--color-text-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.export-dialog__readout {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  color: var(--color-text-faint);
+}
+
+.export-dialog__select {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 5px 7px;
+  font-size: 0.82em;
+  font-family: inherit;
+}
+.export-dialog__select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.export-dialog__range {
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+
+.export-dialog__color-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.export-dialog__color {
+  width: 34px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.export-dialog__hex {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 5px 7px;
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+}
+.export-dialog__hex:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.export-dialog__segmented {
+  display: flex;
+  gap: 4px;
+}
+
+.export-dialog__segment {
+  flex: 1;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 5px 0;
+  font-size: 0.78em;
+  font-family: inherit;
+  cursor: pointer;
+}
+.export-dialog__segment:hover {
+  color: var(--color-text);
+}
+.export-dialog__segment--active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* ── Preview ──────────────────────────────────────────────────────────────── */
+
+.export-dialog__preview {
+  /* The iframe is a true A4 sheet, scaled down by transform. */
+  --page-scale: 0.5;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.export-dialog__page {
+  /* transform does not affect layout, so the wrapper carries the scaled box. */
+  width: calc(210mm * var(--page-scale));
+  height: calc(297mm * var(--page-scale));
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.export-dialog__frame {
+  width: 210mm;
+  height: 297mm;
+  border: 0;
+  display: block;
+  transform: scale(var(--page-scale));
+  transform-origin: top left;
+}
+
+.export-dialog__empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 24px;
+  color: #8a8a8a;
+  font-size: 0.85em;
+}
+
+.export-dialog__hint {
+  margin: 0;
+  font-size: 0.72em;
+  line-height: 1.5;
+  color: var(--color-text-faint);
+  text-align: center;
+  max-width: 320px;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+
+.export-dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 22px 16px;
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.export-dialog__reset {
+  background: none;
+  border: none;
+  color: var(--color-text-faint);
+  font-size: 0.78em;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.export-dialog__reset:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.export-dialog__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.export-dialog__btn {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 0.82em;
+  font-family: inherit;
+  cursor: pointer;
+}
+.export-dialog__btn:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+}
+
+.export-dialog__btn--primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+.export-dialog__btn--primary:hover:not(:disabled) {
+  opacity: 0.9;
+  background: var(--color-accent);
+}
+
+.export-dialog__btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .export-dialog__body { flex-direction: column; }
+  .export-dialog__controls { width: 100%; }
+}

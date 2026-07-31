@@ -3,6 +3,7 @@ import { useCallback, useRef } from 'react'
 import TitleBar from '../chrome/TitleBar'
 import StatusBar from '../chrome/StatusBar'
 import ShortcutsOverlay from '../chrome/ShortcutsOverlay'
+import ExportDialog from '../export/ExportDialog'
 import Notice from '../chrome/Notice'
 import Sidebar from './Sidebar'
 import SplitPane from './SplitPane'
@@ -19,6 +20,8 @@ export default function AppShell() {
   const setChatPanelWidth = useUiStore((s) => s.setChatPanelWidth)
   const shortcutsVisible = useUiStore((s) => s.shortcutsVisible)
   const setShortcutsVisible = useUiStore((s) => s.setShortcutsVisible)
+  const exportDialogVisible = useUiStore((s) => s.exportDialogVisible)
+  const setExportDialogVisible = useUiStore((s) => s.setExportDialogVisible)
   const transformPanelHeight = useUiStore((s) => s.transformPanelHeight)
   const setTransformPanelHeight = useUiStore((s) => s.setTransformPanelHeight)
   const transformOpen = useTransformStore((s) => s.isOpen)
@@ -100,6 +103,7 @@ export default function AppShell() {
       </div>
       {!focusMode && <StatusBar />}
       {shortcutsVisible && <ShortcutsOverlay onClose={() => setShortcutsVisible(false)} />}
+      {exportDialogVisible && <ExportDialog onClose={() => setExportDialogVisible(false)} />}
       <Notice />
     </div>
   )
