@@ -26,6 +26,13 @@ interface Props {
 /** Slightly longer than the preview pane's 150 ms — Shiki tokenising is in this path. */
 const FRAGMENT_DEBOUNCE_MS = 200
 
+/** Readable text from an unknown thrown value, for the notice and the error strip. */
+function messageOf(err: unknown): string {
+  if (err instanceof Error) return err.message
+  const s = String(err)
+  return s === '[object Object]' ? 'Unknown error' : s
+}
+
 const HEX_PATTERN = /^#[0-9a-fA-F]{6}$/
 
 /** The settings whose values are #rrggbb strings. */
@@ -100,6 +107,7 @@ export default function ExportDialog({ onClose }: Props) {
   const resetSettings = useExportStore((s) => s.resetSettings)
 
   const [fragment, setFragment] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const frameRef = useRef<HTMLIFrameElement>(null)
 
@@ -129,9 +137,16 @@ export default function ExportDialog({ onClose }: Props) {
     const baseDir = currentBaseDir()
     const timer = setTimeout(() => {
       markdownToHtmlFragment(content, { codeTheme: settings.codeTheme, baseDir })
-        .then(setFragment)
-        .catch(() => {
-          // Keep the last good render on screen rather than blanking the preview.
+        .then((html) => {
+          setFragment(html)
+          setError(null)
+        })
+        .catch((err) => {
+          // Keep the last good render on screen rather than blanking the preview,
+          // but never fail silently — a blank preview with no explanation is what
+          // made the CSP/WebAssembly failure so hard to diagnose.
+          console.error('[export] rendering failed:', err)
+          setError(messageOf(err))
         })
     }, FRAGMENT_DEBOUNCE_MS)
     return () => clearTimeout(timer)
@@ -175,8 +190,10 @@ export default function ExportDialog({ onClose }: Props) {
       )
       await printHtml(html)
       onClose()
-    } catch {
-      notify('Could not open the print dialog.')
+    } catch (err) {
+      console.error('[export] export failed:', err)
+      setError(messageOf(err))
+      notify(`Export failed: ${messageOf(err)}`)
     } finally {
       setBusy(false)
     }
@@ -291,6 +308,11 @@ export default function ExportDialog({ onClose }: Props) {
               {isEmpty ? (
                 <div className="export-dialog__empty">
                   Nothing to export — this document is empty.
+                </div>
+              ) : error && fragment == null ? (
+                <div className="export-dialog__empty export-dialog__empty--error">
+                  Could not render this document.
+                  <span className="export-dialog__error-detail">{error}</span>
                 </div>
               ) : (
                 <iframe
