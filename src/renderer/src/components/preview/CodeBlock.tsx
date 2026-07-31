@@ -1,13 +1,26 @@
-import { useEffect, useState, type ComponentPropsWithoutRef } from 'react'
+import {
+  useEffect,
+  useState,
+  type ComponentPropsWithoutRef,
+  type ReactElement,
+  type ReactNode
+} from 'react'
 import { getHighlighter } from '../../lib/shiki-instance'
 
 type Props = ComponentPropsWithoutRef<'pre'>
+
+/**
+ * What rehype-react hands a <pre>: a single <code> child carrying the fence's
+ * source text and its `language-*` class. React 19 types `ReactElement`'s props
+ * as `unknown` by default, so the expected shape has to be stated explicitly.
+ */
+type CodeElementProps = { children?: ReactNode; className?: string }
 
 export default function CodeBlock({ children, ...rest }: Props) {
   const [html, setHtml] = useState<string | null>(null)
 
   useEffect(() => {
-    const codeEl = (children as React.ReactElement)?.props
+    const codeEl = (children as ReactElement<CodeElementProps> | undefined)?.props
     if (!codeEl) return
 
     const rawCode = typeof codeEl.children === 'string' ? codeEl.children : ''

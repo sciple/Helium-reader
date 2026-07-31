@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
-import { createProcessor } from '../lib/remark-pipeline.tsx'
+import { createProcessor } from '../lib/remark-pipeline'
 
 const processor = createProcessor()
 
