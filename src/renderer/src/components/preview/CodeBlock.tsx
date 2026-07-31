@@ -14,17 +14,24 @@ export default function CodeBlock({ children, ...rest }: Props) {
     const className: string = codeEl.className ?? ''
     const lang = className.replace('language-', '') || 'text'
 
-    getHighlighter().then((hl) => {
-      try {
-        const highlighted = hl.codeToHtml(rawCode.trimEnd(), {
-          lang,
-          theme: 'github-dark'
-        })
-        setHtml(highlighted)
-      } catch {
-        setHtml(`<pre><code>${rawCode}</code></pre>`)
-      }
-    })
+    getHighlighter()
+      .then((hl) => {
+        try {
+          const highlighted = hl.codeToHtml(rawCode.trimEnd(), {
+            lang,
+            theme: 'github-dark'
+          })
+          setHtml(highlighted)
+        } catch {
+          setHtml(`<pre><code>${rawCode}</code></pre>`)
+        }
+      })
+      .catch((err) => {
+        // The highlighter itself failed to start (it compiles a WebAssembly grammar
+        // engine, which a strict CSP can block). Falling back to an unhighlighted
+        // <pre> is fine, but doing it silently hid exactly that bug for a long time.
+        console.warn('[preview] syntax highlighting unavailable:', err)
+      })
   }, [children])
 
   if (html) {

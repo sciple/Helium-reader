@@ -24,13 +24,20 @@ export async function markdownToHtmlFragment(
   opts: FragmentOptions
 ): Promise<string> {
   // Must resolve before the processor runs: rehype plugins are synchronous.
-  const highlighter = await getHighlighter()
+  // Highlighting is a nicety, not a requirement — Shiki compiles a WebAssembly
+  // grammar engine, which a strict CSP can refuse. Losing colour in code blocks
+  // must never cost the user their whole export, so a failure here degrades to
+  // plain, correctly-escaped <pre> blocks instead of propagating.
+  const highlighter = await getHighlighter().catch((err) => {
+    console.warn('[export] syntax highlighting unavailable:', err)
+    return null
+  })
 
-  const processor = createBaseProcessor()
-    .use(rehypeHeadingIds)
-    .use(rehypeShiki, { highlighter, theme: opts.codeTheme })
-    .use(rehypeExportImages, { baseDir: opts.baseDir })
-    .use(rehypeStringify)
+  let processor = createBaseProcessor().use(rehypeHeadingIds)
+  if (highlighter) {
+    processor = processor.use(rehypeShiki, { highlighter, theme: opts.codeTheme })
+  }
+  processor = processor.use(rehypeExportImages, { baseDir: opts.baseDir }).use(rehypeStringify)
 
   return String(await processor.process(markdown))
 }
