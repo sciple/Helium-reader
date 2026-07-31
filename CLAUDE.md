@@ -89,6 +89,17 @@ State is managed exclusively with **Zustand**. The five stores are:
 
 Feature work is merged with `--no-ff` and preceded by a tag on the pre-feature tip, so each feature has a single handle to revert by.
 
+**Export to PDF** — merge commit `3e2fb3c`, tag `pre-pdf-export` (= `9c38017`, the state before the feature):
+
+```bash
+git revert -m 1 3e2fb3c              # undo the whole feature, keeps history
+git diff pre-pdf-export master       # see everything it changed
+```
+
+Note that this merge also contains a preparatory refactor (`c8ff787`) that split the
+shared markdown pipeline into `lib/markdown/pipeline-base.ts` and moved image path
+resolution into `lib/mediaImages.ts`. Reverting the merge undoes that too.
+
 **Image drag-and-drop / paste** — merge commit `ffb3f1e`, tag `pre-image-drop` (= `d9629e3`, the state before the feature):
 
 ```bash
