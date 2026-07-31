@@ -21,6 +21,7 @@ interface UiState {
   chatPanelVisible: boolean
   chatPanelWidth: number
   shortcutsVisible: boolean
+  exportDialogVisible: boolean
   spellCheckEnabled: boolean
   toggleSpellCheck: () => void
   toggleSidebar: () => void
@@ -40,6 +41,7 @@ interface UiState {
   setChatPanelWidth: (w: number) => void
   toggleShortcuts: () => void
   setShortcutsVisible: (v: boolean) => void
+  setExportDialogVisible: (v: boolean) => void
   transformPanelHeight: number
   setTransformPanelHeight: (h: number) => void
 }
@@ -57,6 +59,7 @@ export const useUiStore = create<UiState>((set) => ({
   chatPanelVisible: false,
   chatPanelWidth: 340,
   shortcutsVisible: false,
+  exportDialogVisible: false,
   // Persisted: off means the editor's red spell-check underlines are hidden
   // (e.g. when writing in a language the English dictionary doesn't cover).
   spellCheckEnabled: localStorage.getItem('spellCheckEnabled') !== 'false',
@@ -86,6 +89,10 @@ export const useUiStore = create<UiState>((set) => ({
   setChatPanelWidth: (w) => set({ chatPanelWidth: Math.max(240, Math.min(600, w)) }),
   toggleShortcuts: () => set((s) => ({ shortcutsVisible: !s.shortcutsVisible })),
   setShortcutsVisible: (v) => set({ shortcutsVisible: v }),
+  // A setter rather than a toggle: the native menu accelerator and the keydown
+  // handler can both fire for Ctrl+P, and set(true) twice is a no-op where a
+  // toggle would open the dialog and immediately close it again.
+  setExportDialogVisible: (v) => set({ exportDialogVisible: v }),
   transformPanelHeight: 220,
   setTransformPanelHeight: (h) => set({ transformPanelHeight: Math.max(140, Math.min(400, h)) }),
 }))

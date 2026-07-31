@@ -105,6 +105,34 @@ Type `/math` on an empty line for a centered block, or `/imath` for inline.
 - Because a single `$` opens inline math, write literal dollar amounts as `\$5`, not `$5`.
 - A malformed expression shows its raw source in red, with the parse error on hover; the rest of the document still renders.
 
+### Export to PDF
+
+Press `Ctrl+P`, or use **File → Export to PDF**, to open the export dialog.
+
+The left side controls how the exported document looks; the right side shows a live
+preview of the actual page:
+
+- **Typography** — body font, heading font (or "Match body"), base size in points, line height.
+- **Colours** — page background, body text, links, and headings, each settable with a colour
+  picker or by typing a hex value. Code blocks have their own light or dark syntax theme.
+- **Reset to defaults** restores the built-in white-page profile.
+
+Clicking **Export PDF** opens the Windows print dialog — choose **Save as PDF** or
+**Microsoft Print to PDF** as the destination and pick where to save. The suggested
+filename comes from the document name.
+
+- Text, code and KaTeX equations stay as real vector text: selectable and searchable in the
+  finished PDF, not screenshots.
+- Headings are kept off the bottom of a page, table headers repeat across pages, and long
+  code listings split rather than being cut off.
+- **Paper size and margins are chosen in the print dialog**, not in the export settings. The
+  document starts from an 18 mm margin, which the dialog can override.
+- Your export settings are remembered across sessions and are independent of the app's own
+  light/dark theme — a dark editor still exports a white page unless you say otherwise.
+- If code-block backgrounds are missing in the result, enable **Background graphics** in the
+  print dialog's *More settings*.
+- Links to other markdown files do not resolve inside a PDF; web links do.
+
 ### Document outline
 
 When a file is open, the **Outline** section at the top of the sidebar lists all headings (H1–H6). Click any heading to scroll both the preview pane and the editor to that section. Click **▾ Outline** to collapse or expand the panel.

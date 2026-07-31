@@ -1,3 +1,4 @@
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { useEditorStore } from '../store/editorStore'
 import { useFileSystemStore } from '../store/fileSystemStore'
 
@@ -43,6 +44,48 @@ export function timestampName(date = new Date()): string {
 export function dirOf(path: string): string {
   const i = path.lastIndexOf('/')
   return i > 0 ? path.slice(0, i) : path
+}
+
+/** Schemes and absolute paths that must be passed through untouched. */
+const NON_RELATIVE = /^(?:[a-z][a-z0-9+.-]*:|\/|[a-zA-Z]:\/)/
+
+/** Collapse . and .. segments, so "../media/shot.png" resolves correctly. */
+function normalizeSegments(path: string): string {
+  const out: string[] = []
+  for (const segment of path.split('/')) {
+    if (segment === '.' || segment === '') continue
+    if (segment === '..') out.pop()
+    else out.push(segment)
+  }
+  return out.join('/')
+}
+
+/**
+ * Turn a markdown image target into a URL the webview can load. Relative sources
+ * resolve against `baseDir`; anything with a scheme or an absolute path passes through.
+ * Shared by the live preview and the PDF export so both resolve images identically.
+ */
+export function resolveAssetSrc(src: string | undefined, baseDir: string | null): string {
+  if (!src) return ''
+  if (NON_RELATIVE.test(src) || !baseDir) return src
+
+  let decoded = src
+  try {
+    decoded = decodeURIComponent(src)
+  } catch {
+    // Malformed escape in a hand-written link — use it verbatim.
+  }
+  return convertFileSrc(normalizeSegments(`${baseDir}/${decoded}`))
+}
+
+/**
+ * The folder relative image paths resolve against: the open document's own folder,
+ * falling back to the vault root when there is no file open yet.
+ */
+export function currentBaseDir(): string | null {
+  const filePath = useEditorStore.getState().currentFilePath
+  if (filePath) return dirOf(filePath)
+  return useFileSystemStore.getState().rootPath
 }
 
 /** Percent-encode the characters that would break a markdown link target. */

@@ -61,11 +61,21 @@ export default function App() {
       }
     }
 
+    // Idempotent on purpose: the native menu accelerator and the keydown handler
+    // below can both fire for Ctrl+P, and set(true) twice opens the dialog once.
+    const openExportDialog = () => useUiStore.getState().setExportDialogVisible(true)
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
         if (e.shiftKey) handleSaveAs()
         else handleSave()
+      }
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'p') {
+        // preventDefault also suppresses WebView2's own Ctrl+P, which would
+        // otherwise print the whole app window.
+        e.preventDefault()
+        openExportDialog()
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
         e.preventDefault()
@@ -105,6 +115,7 @@ export default function App() {
     window.addEventListener('menu:open-folder', openFolder)
     window.addEventListener('menu:save', handleSave)
     window.addEventListener('menu:save-as', handleSaveAs)
+    window.addEventListener('menu:export-pdf', openExportDialog)
     window.addEventListener('menu:toggle-sidebar', toggleSidebar)
     window.addEventListener('menu:toggle-focus', toggleFocusMode)
     window.addEventListener('menu:toggle-preview', togglePreview)
@@ -116,6 +127,7 @@ export default function App() {
       window.removeEventListener('menu:open-folder', openFolder)
       window.removeEventListener('menu:save', handleSave)
       window.removeEventListener('menu:save-as', handleSaveAs)
+      window.removeEventListener('menu:export-pdf', openExportDialog)
       window.removeEventListener('menu:toggle-sidebar', toggleSidebar)
       window.removeEventListener('menu:toggle-focus', toggleFocusMode)
       window.removeEventListener('menu:toggle-preview', togglePreview)

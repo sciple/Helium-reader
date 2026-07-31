@@ -11,6 +11,8 @@ pub fn build_menu<R: Runtime>(app: &AppHandle<R>) -> tauri::Result<Menu<R>> {
         .item(&MenuItemBuilder::with_id("menu:save", "Save").accelerator("CmdOrCtrl+S").build(app)?)
         .item(&MenuItemBuilder::with_id("menu:save-as", "Save As...").accelerator("CmdOrCtrl+Shift+S").build(app)?)
         .separator()
+        .item(&MenuItemBuilder::with_id("menu:export-pdf", "Export to PDF...").accelerator("CmdOrCtrl+P").build(app)?)
+        .separator()
         .item(&PredefinedMenuItem::quit(app, None)?)
         .build()?;
 
