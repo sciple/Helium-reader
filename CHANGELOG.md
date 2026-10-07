@@ -15,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Spell-check toggle** — a switch in the status bar turns the editor's red spell-check underlines on or off, so you can write in languages the English dictionary doesn't cover (e.g. Italian) without every word being flagged. The setting is remembered across sessions.
 
 ### Fixed
+- **Chat with pinned files on strict models** — attaching document context (the open file or pinned files) together with a system prompt sent several `system` messages, which models with strict chat templates such as Gemma 3 reject ("Conversation roles must alternate user/assistant"). The system prompt and all document context are now sent as one system message.
 - **Syntax highlighting in installed builds** — code blocks rendered without colour in the packaged app (though correctly in development), because the app's content security policy blocked the WebAssembly grammar engine the highlighter compiles. The failure was silent, so it went unnoticed since 1.0.0. Highlighting now works in installed builds, and a highlighter that fails to start is reported instead of being swallowed.
 - PDF export no longer depends on syntax highlighting: if the highlighter is unavailable, code blocks export as plain text rather than the whole export failing.
 - Relative image paths in the preview now resolve against the open document's own folder instead of the folder root, so images referenced from a note in a subfolder render correctly.

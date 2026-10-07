@@ -97,12 +97,16 @@ export const useChatStore = create<ChatState>((set, get) => ({
       })
     )).filter((d): d is { name: string; content: string } => d != null)
 
+    // A single system message: some chat templates (e.g. Gemma 3) reject more
+    // than one, failing with "Conversation roles must alternate user/assistant".
+    const systemContent = [
+      ...(systemPrompt ? [systemPrompt] : []),
+      ...(includeDocument && docContent ? [`Document context — ${fileName}:\n\n${docContent}`] : []),
+      ...pinnedDocs.map((d) => `Document context — ${d.name}:\n\n${d.content}`)
+    ].join('\n\n')
+
     const apiMessages = [
-      ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
-      ...(includeDocument && docContent
-        ? [{ role: 'system' as const, content: `Document context — ${fileName}:\n\n${docContent}` }]
-        : []),
-      ...pinnedDocs.map((d) => ({ role: 'system' as const, content: `Document context — ${d.name}:\n\n${d.content}` })),
+      ...(systemContent ? [{ role: 'system' as const, content: systemContent }] : []),
       ...[...history, userMessage].map((m) => ({
         role: m.role as 'user' | 'assistant' | 'system',
         content: m.content
