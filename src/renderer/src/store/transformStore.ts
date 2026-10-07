@@ -104,3 +104,17 @@ export const useTransformStore = create<TransformState>((set, get) => ({
     set({ isStreaming: false, _cleanup: null })
   },
 }))
+
+// While the panel is open, follow the editor selection: a new non-empty
+// selection becomes the text to transform. Any result (or stream in flight)
+// belongs to the old selection, so it is dropped — otherwise Accept would
+// replace the new selection with a rewrite of the old one.
+useEditorStore.subscribe((state, prev) => {
+  const text = state.selectedText
+  if (text === prev.selectedText || !text.trim()) return
+  const transform = useTransformStore.getState()
+  if (!transform.isOpen || text === transform.originalText) return
+  if (transform.isStreaming) transform.abort()
+  else transform._cleanup?.()
+  useTransformStore.setState({ originalText: text, result: '' })
+})
