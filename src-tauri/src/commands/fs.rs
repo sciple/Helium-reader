@@ -163,6 +163,21 @@ pub fn rename_file(
     let old_native = state.sandbox.assert_allowed(&old_path).map_err(String::from)?;
     let new_native = state.sandbox.assert_allowed(&new_path).map_err(String::from)?;
 
+    // fs::rename replaces an existing target on Windows, which would silently
+    // delete that file. Only a case-only rename (same file on disk) may proceed.
+    if new_native.exists() {
+        let same_file = match (dunce::canonicalize(&old_native), dunce::canonicalize(&new_native)) {
+            (Ok(a), Ok(b)) => a == b,
+            _ => false,
+        };
+        if !same_file {
+            return Err(format!(
+                "A file named \"{}\" already exists.",
+                new_native.file_name().map(|n| n.to_string_lossy().to_string()).unwrap_or_default()
+            ));
+        }
+    }
+
     fs::rename(&old_native, &new_native).map_err(|e| AppError::Io(e).to_string())?;
 
     Ok(RenameResult {

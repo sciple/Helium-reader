@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import AppShell from './components/layout/AppShell'
 import { useEditorStore } from './store/editorStore'
 import { useUiStore } from './store/uiStore'
 import { useTransformStore } from './store/transformStore'
 import { useFileSystem } from './hooks/useFileSystem'
 import { useFocusMode } from './hooks/useFocusMode'
+import { confirmUnsavedChanges } from './lib/unsavedChanges'
 
 export default function App() {
   useFocusMode()
@@ -21,6 +23,22 @@ export default function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', colorTheme)
   }, [colorTheme])
+
+  // Ask about unsaved edits before the window closes (title-bar X, Alt+F4, taskbar).
+  useEffect(() => {
+    let asking = false
+    const unlisten = getCurrentWindow().onCloseRequested(async (event) => {
+      // A second close while the dialog is up must not close underneath it.
+      if (asking) { event.preventDefault(); return }
+      asking = true
+      try {
+        if (!(await confirmUnsavedChanges())) event.preventDefault()
+      } finally {
+        asking = false
+      }
+    })
+    return () => { unlisten.then((fn) => fn()) }
+  }, [])
 
   useEffect(() => {
     const handleSave = async () => {

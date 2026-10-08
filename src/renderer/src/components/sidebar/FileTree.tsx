@@ -4,6 +4,7 @@ import { useFileSystemStore } from '../../store/fileSystemStore'
 import { useEditorStore } from '../../store/editorStore'
 import FileTreeNode from './FileTreeNode'
 import { useWatcher } from '../../hooks/useWatcher'
+import { confirmUnsavedChanges } from '../../lib/unsavedChanges'
 
 interface Props {
   creatingAtRoot: boolean
@@ -17,6 +18,7 @@ export default function FileTree({ creatingAtRoot, onRootCreateDone, creatingFil
   const rootPath = useFileSystemStore((s) => s.rootPath)
   const folderInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const submittingRef = useRef(false)
   useWatcher(rootPath)
 
   useEffect(() => {
@@ -36,10 +38,23 @@ export default function FileTree({ creatingAtRoot, onRootCreateDone, creatingFil
   }
 
   const handleRootFileCreate = async (name: string) => {
+    // Enter hides the input, and the input then fires blur too; act only once.
+    if (submittingRef.current) return
+    submittingRef.current = true
+    onRootFileCreateDone()
+    try {
+      await createRootFile(name)
+    } finally {
+      submittingRef.current = false
+    }
+  }
+
+  const createRootFile = async (name: string) => {
     const trimmed = name.trim()
     if (trimmed && rootPath) {
       const fileName = trimmed.endsWith('.md') || trimmed.endsWith('.markdown') ? trimmed : `${trimmed}.md`
       const filePath = `${rootPath}/${fileName}`
+      if (filePath !== useEditorStore.getState().currentFilePath && !(await confirmUnsavedChanges())) return
       try {
         await window.api.createFile(filePath)
         const result = await window.api.readFile(filePath)
@@ -53,7 +68,6 @@ export default function FileTree({ creatingAtRoot, onRootCreateDone, creatingFil
         } catch { /* ignore */ }
       }
     }
-    onRootFileCreateDone()
   }
 
   return (

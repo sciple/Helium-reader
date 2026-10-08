@@ -11,6 +11,7 @@ interface EditorState {
   updateContent: (content: string) => void
   updateSelection: (size: number, text: string) => void
   markSaved: (path?: string) => void
+  setPath: (path: string) => void
   newFile: () => void
 }
 
@@ -36,6 +37,9 @@ export const useEditorStore = create<EditorState>((set, get) => ({
       isDirty: false,
       currentFilePath: path ?? s.currentFilePath
     })),
+
+  // The open file moved on disk (rename). Content and the unsaved flag are kept.
+  setPath: (path) => set({ currentFilePath: path }),
 
   newFile: () =>
     set({ currentFilePath: null, content: '', savedContent: '', isDirty: false })

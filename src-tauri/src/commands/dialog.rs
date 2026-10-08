@@ -1,5 +1,5 @@
 use tauri::{AppHandle, State};
-use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogResult};
 
 use crate::{
     paths::to_forward_slashes,
@@ -59,18 +59,28 @@ pub async fn confirm_discard(
     app: AppHandle,
     file_name: String,
 ) -> Result<String, String> {
-    // Tauri dialog doesn't support 3-button native dialogs; we use Save/Discard.
-    // Closing the dialog without clicking = "cancel" is not available here;
-    // pressing Discard covers that case in practice.
-    let save = app
+    const SAVE: &str = "Save";
+    const DISCARD: &str = "Don't Save";
+
+    let result = app
         .dialog()
         .message(format!("Do you want to save changes to \"{}\"?", file_name))
         .title("Unsaved Changes")
-        .buttons(MessageDialogButtons::OkCancelCustom(
-            "Save".to_string(),
-            "Discard".to_string(),
+        .buttons(MessageDialogButtons::YesNoCancelCustom(
+            SAVE.to_string(),
+            DISCARD.to_string(),
+            "Cancel".to_string(),
         ))
-        .blocking_show();
+        .blocking_show_with_result();
 
-    Ok(if save { "save" } else { "discard" }.to_string())
+    // Anything other than an explicit Save / Don't Save — including closing the
+    // dialog with X or Esc — is a cancel, so unsaved work is never dropped by accident.
+    Ok(match result {
+        MessageDialogResult::Yes => "save",
+        MessageDialogResult::No => "discard",
+        MessageDialogResult::Custom(ref label) if label == SAVE => "save",
+        MessageDialogResult::Custom(ref label) if label == DISCARD => "discard",
+        _ => "cancel",
+    }
+    .to_string())
 }

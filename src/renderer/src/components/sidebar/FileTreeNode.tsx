@@ -4,6 +4,8 @@ import type { FileEntry } from '@shared/types'
 import { useEditorStore } from '../../store/editorStore'
 import { useFileSystemStore } from '../../store/fileSystemStore'
 import { useChatStore } from '../../store/chatStore'
+import { confirmUnsavedChanges } from '../../lib/unsavedChanges'
+import { notify } from '../../lib/notice'
 
 interface Props {
   node: FileEntry
@@ -17,7 +19,6 @@ export default function FileTreeNode({ node, depth = 0 }: Props) {
   const [isCreatingFile, setIsCreatingFile] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
   const currentFilePath = useEditorStore((s) => s.currentFilePath)
-  const isDirty = useEditorStore((s) => s.isDirty)
   const rootPath = useFileSystemStore((s) => s.rootPath)
   const pinnedByRoot = useChatStore((s) => s.pinnedByRoot)
   const togglePin = useChatStore((s) => s.togglePin)
@@ -25,6 +26,7 @@ export default function FileTreeNode({ node, depth = 0 }: Props) {
   const createInputRef = useRef<HTMLInputElement>(null)
   const createFileInputRef = useRef<HTMLInputElement>(null)
   const renameInputRef = useRef<HTMLInputElement>(null)
+  const submittingRef = useRef(false)
 
   useEffect(() => {
     if (isCreating) createInputRef.current?.focus()
@@ -49,16 +51,7 @@ export default function FileTreeNode({ node, depth = 0 }: Props) {
       }
       setExpanded((v) => !v)
     } else {
-      if (isDirty && currentFilePath && currentFilePath !== node.path) {
-        const store = useEditorStore.getState()
-        const currentName = currentFilePath.split('/').pop() ?? 'Untitled'
-        const choice = await window.api.confirmDiscard(currentName)
-        if (choice === 'cancel') return
-        if (choice === 'save') {
-          await window.api.writeFile(currentFilePath, store.content)
-          store.markSaved()
-        }
-      }
+      if (currentFilePath !== node.path && !(await confirmUnsavedChanges())) return
       const result = await window.api.readFile(node.path)
       useEditorStore.getState().openFile(result.path, result.content)
       window.api.setWindowTitle(`${node.name} — Helium Reader`)
@@ -96,18 +89,25 @@ export default function FileTreeNode({ node, depth = 0 }: Props) {
   }
 
   const handleCreateFile = async (name: string) => {
-    const trimmed = name.trim()
-    if (trimmed) {
+    // Enter hides the input, and the input then fires blur too; act only once.
+    if (submittingRef.current) return
+    submittingRef.current = true
+    setIsCreatingFile(false)
+    try {
+      const trimmed = name.trim()
+      if (!trimmed) return
       const fileName = trimmed.endsWith('.md') || trimmed.endsWith('.markdown') ? trimmed : `${trimmed}.md`
       const filePath = `${node.path}/${fileName}`
+      if (filePath !== currentFilePath && !(await confirmUnsavedChanges())) return
       try {
         await window.api.createFile(filePath)
       } catch { /* already exists */ }
       const result = await window.api.readFile(filePath)
       useEditorStore.getState().openFile(result.path, result.content)
       window.api.setWindowTitle(`${fileName} — Helium Reader`)
+    } finally {
+      submittingRef.current = false
     }
-    setIsCreatingFile(false)
   }
 
   const handleContextMenu = async (e: React.MouseEvent) => {
@@ -118,16 +118,29 @@ export default function FileTreeNode({ node, depth = 0 }: Props) {
   }
 
   const handleRename = async (newName: string) => {
-    const trimmed = newName.trim()
+    // Enter hides the input, and the input then fires blur too; act only once.
+    if (submittingRef.current) return
+    submittingRef.current = true
     setIsRenaming(false)
-    if (!trimmed || trimmed === node.name) return
-    const parentPath = node.path.substring(0, node.path.lastIndexOf('/'))
-    const newPath = `${parentPath}/${trimmed}`
-    await window.api.renameFile(node.path, newPath)
-    // If the renamed file was open, update the editor path
-    if (currentFilePath === node.path) {
-      useEditorStore.getState().openFile(newPath, useEditorStore.getState().content)
-      window.api.setWindowTitle(`${trimmed} — Helium Reader`)
+    try {
+      const trimmed = newName.trim()
+      if (!trimmed || trimmed === node.name) return
+      const parentPath = node.path.substring(0, node.path.lastIndexOf('/'))
+      const newPath = `${parentPath}/${trimmed}`
+      try {
+        await window.api.renameFile(node.path, newPath)
+      } catch (err) {
+        notify(`Could not rename ${node.name}: ${String(err)}`)
+        return
+      }
+      // If the renamed file was open, point the editor at the new path.
+      // Unsaved edits stay unsaved: the file on disk still has the old text.
+      if (useEditorStore.getState().currentFilePath === node.path) {
+        useEditorStore.getState().setPath(newPath)
+        window.api.setWindowTitle(`${trimmed} — Helium Reader`)
+      }
+    } finally {
+      submittingRef.current = false
     }
   }
 
