@@ -144,6 +144,7 @@ Open the chat panel with `Ctrl+Shift+L`. Requires LM Studio running locally.
 - **Settings (⚙)** — set the API URL, model name, system prompt, and context window size.
 - **Selection as context** — select text in the editor before sending a message; it is automatically included as a block-quoted context.
 - **Full document as context** — click the **📄** button in the chat header to include the entire document as a system message with every send.
+- **Progress while you wait** — until the first words of the answer arrive, the chat (and the transform panel) says what is happening: reading pinned files, the model reading the prompt (with its approximate size in tokens), or the model thinking, with an elapsed-seconds counter.
 - `Enter` sends, `Shift+Enter` adds a newline, `Esc` aborts a stream.
 
 ### AI text transform

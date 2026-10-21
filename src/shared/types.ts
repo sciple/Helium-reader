@@ -46,6 +46,7 @@ export interface WindowApi {
     onDone: (cb: () => void) => () => void
     onError: (cb: (message: string) => void) => () => void
     onUsage: (cb: (usage: ChatUsage) => void) => () => void
+    onPhase: (cb: (phase: string) => void) => () => void
   }
   openFolderDialog: () => Promise<string | null>
   readDirectory: (path: string, depth: number) => Promise<FileEntry[]>

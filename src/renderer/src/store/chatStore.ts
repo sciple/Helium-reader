@@ -8,9 +8,21 @@ export interface ChatMessage {
   content: string
 }
 
+/** What a request is doing before its first answer text arrives; null once text flows. */
+export type StreamPhaseName = 'reading-files' | 'waiting' | 'thinking'
+
+/** Rough prompt size for the waiting line: ~4 characters per token. */
+export function estimateTokens(messages: { content: string }[]): number {
+  return Math.round(messages.reduce((n, m) => n + m.content.length, 0) / 4)
+}
+
 interface ChatState {
   messages: ChatMessage[]
   isStreaming: boolean
+  phase: StreamPhaseName | null
+  phaseStartedAt: number
+  promptTokensEstimate: number
+  pinsReading: number
   lmStudioUrl: string
   model: string
   systemPrompt: string
@@ -46,6 +58,10 @@ function parseContextWindow(raw: string | null): number | null {
 export const useChatStore = create<ChatState>((set, get) => ({
   messages: [],
   isStreaming: false,
+  phase: null,
+  phaseStartedAt: 0,
+  promptTokensEstimate: 0,
+  pinsReading: 0,
   lmStudioUrl: localStorage.getItem('lmStudioUrl') ?? 'http://localhost:1234',
   model: localStorage.getItem('lmStudioModel') ?? '',
   systemPrompt: localStorage.getItem('lmStudioSystemPrompt') ?? '',
@@ -80,14 +96,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { content: docContent, currentFilePath } = useEditorStore.getState()
     const fileName = currentFilePath?.split('/').pop() ?? 'document'
 
-    set((s) => ({
-      messages: [...s.messages, userMessage, assistantMessage],
-      isStreaming: true
-    }))
-
     const rootPath = useFileSystemStore.getState().rootPath
     const pins = rootPath ? (pinnedByRoot[rootPath] ?? []) : []
     const toSend = pins.filter((p) => !(includeDocument && p === currentFilePath))
+
+    set((s) => ({
+      messages: [...s.messages, userMessage, assistantMessage],
+      isStreaming: true,
+      phase: toSend.length > 0 ? 'reading-files' : 'waiting',
+      phaseStartedAt: Date.now(),
+      promptTokensEstimate: 0,
+      pinsReading: toSend.length
+    }))
+
     const pinnedDocs = (await Promise.all(
       toSend.map(async (p) => {
         try {
@@ -113,8 +134,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
       }))
     ]
 
+    // The request may have been aborted while the pinned files were being read.
+    if (!get().isStreaming) return
+    set({ phase: 'waiting', promptTokensEstimate: estimateTokens(apiMessages) })
+
     await new Promise<void>((resolve) => {
       const offChunk = window.api.chat.onChunk((delta) => {
+        if (get().phase !== null) set({ phase: null })
         set((s) => ({
           messages: s.messages.map((m) =>
             m.id === assistantId ? { ...m, content: m.content + delta } : m
@@ -126,12 +152,17 @@ export const useChatStore = create<ChatState>((set, get) => ({
         set({ contextUsed: promptTokens + completionTokens })
       })
 
+      const offPhase = window.api.chat.onPhase((phase) => {
+        if (phase === 'thinking' && get().phase === 'waiting') set({ phase: 'thinking' })
+      })
+
       const cleanup = () => {
         offChunk()
         offUsage()
+        offPhase()
         offDone()
         offError()
-        set({ isStreaming: false, _cleanup: null })
+        set({ isStreaming: false, phase: null, _cleanup: null })
         resolve()
       }
 
@@ -152,7 +183,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
     })
   },
 
-  abort: () => { get()._cleanup?.(); window.api.chat.abort() },
+  abort: () => {
+    get()._cleanup?.()
+    window.api.chat.abort()
+    // Covers an abort while pinned files are still being read, before any cleanup exists.
+    set({ isStreaming: false, phase: null })
+  },
 
   clearHistory: () => set({ messages: [], contextUsed: 0 }),
 

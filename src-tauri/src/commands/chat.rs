@@ -113,8 +113,12 @@ async fn stream_completion(
     let chunk_event = format!("{}:chunk", prefix);
     let done_event  = format!("{}:done",  prefix);
     let usage_event = format!("{}:usage", prefix);
+    let phase_event = format!("{}:phase", prefix);
 
     let mut buffer = String::new();
+    // Reasoning models stream their thinking in a separate field; we don't show it,
+    // but say once that it is happening so the UI isn't silent for the whole time.
+    let mut thinking_announced = false;
 
     while let Some(chunk) = response.chunk().await.map_err(|e| e.to_string())? {
         buffer.push_str(&String::from_utf8_lossy(&chunk));
@@ -134,6 +138,15 @@ async fn stream_completion(
                     }
 
                     if let Ok(obj) = serde_json::from_str::<serde_json::Value>(data) {
+                        if !thinking_announced {
+                            let delta = &obj["choices"][0]["delta"];
+                            let reasoning = delta["reasoning_content"].as_str()
+                                .or_else(|| delta["reasoning"].as_str());
+                            if reasoning.is_some_and(|r| !r.is_empty()) {
+                                thinking_announced = true;
+                                let _ = app.emit(&phase_event, "thinking");
+                            }
+                        }
                         if let Some(content) = obj["choices"][0]["delta"]["content"].as_str() {
                             if !content.is_empty() {
                                 let _ = app.emit(&chunk_event, content);

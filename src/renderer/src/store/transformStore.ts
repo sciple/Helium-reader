@@ -1,11 +1,14 @@
 import { create } from 'zustand'
 import { transformApi } from '../lib/tauri-api'
 import { useEditorStore } from './editorStore'
-import { useChatStore } from './chatStore'
+import { useChatStore, estimateTokens, type StreamPhaseName } from './chatStore'
 
 interface TransformState {
   isOpen: boolean
   isStreaming: boolean
+  phase: StreamPhaseName | null
+  phaseStartedAt: number
+  promptTokensEstimate: number
   instruction: string
   originalText: string
   result: string
@@ -23,6 +26,9 @@ interface TransformState {
 export const useTransformStore = create<TransformState>((set, get) => ({
   isOpen: false,
   isStreaming: false,
+  phase: null,
+  phaseStartedAt: 0,
+  promptTokensEstimate: 0,
   instruction: '',
   originalText: '',
   result: '',
@@ -35,7 +41,7 @@ export const useTransformStore = create<TransformState>((set, get) => ({
 
   close: () => {
     get()._cleanup?.()
-    set({ isOpen: false, isStreaming: false, result: '', instruction: '', _cleanup: null })
+    set({ isOpen: false, isStreaming: false, phase: null, result: '', instruction: '', _cleanup: null })
   },
 
   setInstruction: (s) => set({ instruction: s }),
@@ -62,17 +68,28 @@ export const useTransformStore = create<TransformState>((set, get) => ({
       { role: 'user', content: `${instruction.trim()}:\n\n${originalText}` },
     ]
 
-    set({ isStreaming: true, result: '' })
+    set({
+      isStreaming: true,
+      result: '',
+      phase: 'waiting',
+      phaseStartedAt: Date.now(),
+      promptTokensEstimate: estimateTokens(messages)
+    })
 
     const offChunk = transformApi.onChunk((delta) =>
-      set((s) => ({ result: s.result + delta }))
+      set((s) => ({ result: s.result + delta, phase: null }))
     )
+
+    const offPhase = transformApi.onPhase((phase) => {
+      if (phase === 'thinking' && get().phase === 'waiting') set({ phase: 'thinking' })
+    })
 
     const cleanup = () => {
       offChunk()
+      offPhase()
       offDone()
       offError()
-      set({ isStreaming: false, _cleanup: null })
+      set({ isStreaming: false, phase: null, _cleanup: null })
     }
 
     set({ _cleanup: cleanup })
@@ -95,13 +112,13 @@ export const useTransformStore = create<TransformState>((set, get) => ({
 
   discard: () => {
     get()._cleanup?.()
-    set({ result: '', isStreaming: false, _cleanup: null })
+    set({ result: '', isStreaming: false, phase: null, _cleanup: null })
   },
 
   abort: () => {
     transformApi.abort()
     get()._cleanup?.()
-    set({ isStreaming: false, _cleanup: null })
+    set({ isStreaming: false, phase: null, _cleanup: null })
   },
 }))
 

@@ -54,6 +54,7 @@ const api: WindowApi = {
     onDone: (cb) => wrapListen<null>('chat:done', () => cb()),
     onError: (cb) => wrapListen<string>('chat:error', cb),
     onUsage: (cb) => wrapListen<ChatUsage>('chat:usage', cb),
+    onPhase: (cb) => wrapListen<string>('chat:phase', cb),
   },
 
   openFolderDialog: () =>
@@ -124,4 +125,5 @@ export const transformApi = {
   onChunk: (cb: (delta: string) => void) => wrapListen<string>('transform:chunk', cb),
   onDone:  (cb: () => void)              => wrapListen<null>('transform:done', () => cb()),
   onError: (cb: (msg: string) => void)   => wrapListen<string>('transform:error', cb),
+  onPhase: (cb: (phase: string) => void) => wrapListen<string>('transform:phase', cb),
 }

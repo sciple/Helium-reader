@@ -1,6 +1,7 @@
 import './TransformPanel.css'
 import { useEffect, useRef } from 'react'
 import { useTransformStore } from '../../store/transformStore'
+import StreamPhase from '../chat/StreamPhase'
 
 const PRESETS = [
   'Improve style',
@@ -14,6 +15,7 @@ const PRESETS = [
 export default function TransformPanel() {
   const {
     isStreaming, instruction, originalText, result,
+    phase, phaseStartedAt, promptTokensEstimate,
     setInstruction, run, accept, discard, abort, close,
   } = useTransformStore()
 
@@ -93,6 +95,9 @@ export default function TransformPanel() {
           <span className="transform-panel__placeholder">
             {originalText ? 'Choose an instruction above to transform the selected text.' : 'Select text in the editor first, then open this panel.'}
           </span>
+        )}
+        {isStreaming && !result && (
+          <StreamPhase phase={phase} startedAt={phaseStartedAt} tokens={promptTokensEstimate} stopHint="Esc to stop" />
         )}
         {result && <pre className="transform-panel__output">{result}</pre>}
       </div>
