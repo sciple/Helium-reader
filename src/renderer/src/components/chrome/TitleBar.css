@@ -9,23 +9,27 @@
   z-index: 10;
 }
 
+/* The title lives inside the drag area, so it only gets the space left between
+   the toolbar and the window controls and shortens with "…" instead of overlapping them. */
 .titlebar__drag {
   flex: 1;
   height: 100%;
   -webkit-app-region: drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 12px;
 }
 
 .titlebar__title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   font-size: 0.8em;
   color: var(--color-text-muted);
   pointer-events: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 60%;
+  min-width: 0;
 }
 
 .titlebar__toolbar {

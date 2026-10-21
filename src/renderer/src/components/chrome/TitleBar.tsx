@@ -147,8 +147,9 @@ export default function TitleBar() {
           ?
         </button>
       </div>
-      <div className="titlebar__drag" />
-      <span className="titlebar__title">{title}</span>
+      <div className="titlebar__drag">
+        <span className="titlebar__title">{title}</span>
+      </div>
       <div className="titlebar__controls">
         <button
           className="titlebar__btn titlebar__btn--min"
