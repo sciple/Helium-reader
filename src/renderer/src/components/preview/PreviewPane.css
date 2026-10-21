@@ -44,7 +44,16 @@
   border: 1px solid var(--color-border);
   border-radius: 3px;
   padding: 0.1em 0.4em;
-  color: #c3e88d;
+  color: var(--color-code-inline);
+}
+
+/* The inline-code box above must not repeat on every line of a fenced block. */
+.preview-content pre code {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  color: inherit;
 }
 
 .preview-content .code-block {

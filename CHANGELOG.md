@@ -15,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Spell-check toggle** — a switch in the status bar turns the editor's red spell-check underlines on or off, so you can write in languages the English dictionary doesn't cover (e.g. Italian) without every word being flagged. The setting is remembered across sessions.
 
 ### Fixed
+- **Readable code in the light theme** — in the preview, inline `code` is now dark green on light grey instead of pale green, fenced code blocks use a light syntax theme (they were always dark), and lines inside code blocks no longer each get their own grey box.
 - **Roomier title bar** — the title-bar button groups no longer touch the top and bottom edges of the bar; the bar is slightly taller (40 px) and the groups slightly slimmer, with the buttons themselves unchanged.
 - **Window title no longer overlaps the toolbar** — when the window is narrow, the file name in the title bar now shortens with "…" (and disappears if there is no room) instead of being drawn over the toolbar buttons.
 - **Chat history is no longer cleared by accident** — the chat panel's clear button was a ✕ in the top-right corner that looked like a close button. It is now a trash icon labelled **Clear chat**, is disabled when there is nothing to clear, and asks for confirmation (**Clear / Cancel**; closing the prompt with ✕ or `Esc` keeps the chat).

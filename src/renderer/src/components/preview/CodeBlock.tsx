@@ -6,6 +6,7 @@ import {
   type ReactNode
 } from 'react'
 import { getHighlighter } from '../../lib/shiki-instance'
+import { useUiStore } from '../../store/uiStore'
 
 type Props = ComponentPropsWithoutRef<'pre'>
 
@@ -18,6 +19,7 @@ type CodeElementProps = { children?: ReactNode; className?: string }
 
 export default function CodeBlock({ children, ...rest }: Props) {
   const [html, setHtml] = useState<string | null>(null)
+  const colorTheme = useUiStore((s) => s.colorTheme)
 
   useEffect(() => {
     const codeEl = (children as ReactElement<CodeElementProps> | undefined)?.props
@@ -32,7 +34,7 @@ export default function CodeBlock({ children, ...rest }: Props) {
         try {
           const highlighted = hl.codeToHtml(rawCode.trimEnd(), {
             lang,
-            theme: 'github-dark'
+            theme: colorTheme === 'dark' ? 'github-dark' : 'github-light'
           })
           setHtml(highlighted)
         } catch {
@@ -45,7 +47,7 @@ export default function CodeBlock({ children, ...rest }: Props) {
         // <pre> is fine, but doing it silently hid exactly that bug for a long time.
         console.warn('[preview] syntax highlighting unavailable:', err)
       })
-  }, [children])
+  }, [children, colorTheme])
 
   if (html) {
     return <div className="code-block" dangerouslySetInnerHTML={{ __html: html }} />

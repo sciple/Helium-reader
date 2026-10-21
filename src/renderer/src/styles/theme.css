@@ -15,6 +15,7 @@
   --color-sidebar: #1e1e1e;
   --color-divider: #2e2e2e;
   --color-math-error: #ff6b6b;
+  --color-code-inline: #c3e88d;
 
   --sidebar-width: 240px;
   --titlebar-height: 40px;
@@ -41,4 +42,5 @@
   --color-sidebar: #f0f0ee;
   --color-divider: #d4d4d0;
   --color-math-error: #c0392b;
+  --color-code-inline: #2d6a4f;
 }
