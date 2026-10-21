@@ -7,6 +7,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- **New app icon** — the HE mark in light blue on a rounded navy tile, in the same style as the rest of the app family. Source is `resources/Helium_icon_v2.svg`; the old icon is kept as `resources/Helium_icon.svg`.
+
 ### Added
 - **Progress while waiting for the AI** — chat and transform now say what the model is doing before the first words of the answer arrive (reading pinned files, reading the prompt with its approximate size in tokens, thinking), with an elapsed-seconds counter, instead of a bare "…" or nothing.
 - **Export to PDF** — `Ctrl+P` (or File → Export to PDF) opens a dialog with a live page preview and controls for the exported document's typography (body and heading font, base size in points, line height) and colours (page background, body text, links, headings, plus a light or dark code-block theme). Export hands a fully styled document to the Windows print dialog, where you choose **Save as PDF** / **Microsoft Print to PDF**. Math, text and code stay vector and selectable rather than being rasterised, and KaTeX equations render exactly as they do in the preview. Settings are remembered across sessions; paper size and margins are chosen in the print dialog itself.
