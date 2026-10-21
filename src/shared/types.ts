@@ -60,6 +60,7 @@ export interface WindowApi {
   setFocusMode: (enabled: boolean) => Promise<void>
   saveAsDialog: (defaultPath: string) => Promise<string | null>
   confirmDiscard: (fileName: string) => Promise<ConfirmDiscardResult>
+  confirmClearChat: () => Promise<boolean>
   createDirectory: (path: string) => Promise<void>
   createFile: (path: string) => Promise<{ path: string }>
   renameFile: (oldPath: string, newPath: string) => Promise<{ newPath: string }>

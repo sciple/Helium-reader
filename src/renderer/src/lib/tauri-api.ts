@@ -91,6 +91,9 @@ const api: WindowApi = {
   confirmDiscard: (fileName) =>
     invoke<ConfirmDiscardResult>('confirm_discard', { fileName }),
 
+  confirmClearChat: () =>
+    invoke<boolean>('confirm_clear_chat'),
+
   createDirectory: (path) =>
     invoke<void>('create_directory', { path }),
 

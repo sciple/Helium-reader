@@ -48,6 +48,7 @@ pub fn run() {
             commands::dialog::open_folder_dialog,
             commands::dialog::save_as_dialog,
             commands::dialog::confirm_discard,
+            commands::dialog::confirm_clear_chat,
             commands::window::set_window_title,
             commands::window::set_focus_mode,
             commands::window::window_control,

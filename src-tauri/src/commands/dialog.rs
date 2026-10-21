@@ -84,3 +84,25 @@ pub async fn confirm_discard(
     }
     .to_string())
 }
+
+#[tauri::command]
+pub async fn confirm_clear_chat(app: AppHandle) -> Result<bool, String> {
+    const CLEAR: &str = "Clear";
+
+    let result = app
+        .dialog()
+        .message("Clear the whole chat history? This cannot be undone.")
+        .title("Clear Chat")
+        .buttons(MessageDialogButtons::OkCancelCustom(
+            CLEAR.to_string(),
+            "Cancel".to_string(),
+        ))
+        .blocking_show_with_result();
+
+    // Only an explicit Clear counts; closing the dialog with X or Esc keeps the chat.
+    Ok(match result {
+        MessageDialogResult::Ok => true,
+        MessageDialogResult::Custom(ref label) if label == CLEAR => true,
+        _ => false,
+    })
+}

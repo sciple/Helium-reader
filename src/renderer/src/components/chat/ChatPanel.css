@@ -52,6 +52,20 @@
 .chat-panel__icon-btn--active {
   color: var(--color-accent);
 }
+.chat-panel__icon-btn--labeled {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.chat-panel__icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.chat-panel__icon-btn:disabled:hover {
+  color: var(--color-text-faint);
+  background: none;
+}
 
 /* ── Settings row ── */
 
